@@ -74,6 +74,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	CGame* game = CGame::GetInstance();
 	if (!game->Init(hWnd, BACKBUFFER_WIDTH, BACKBUFFER_HEIGHT))
 		return 0;
+	CTexture* texTest = game->LoadTexture(L"assets\\test\\test.png");
 	MSG msg = {};
 	bool running = true;
 	ULONGLONG last = GetTickCount64();
@@ -96,9 +97,11 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		DebugOutTitle(L"x = %.1f", testX);
 
 		game->BeginRender(testX / SCREEN_WIDTH, 0.2f, 0.4f);
+		game->Draw(testX / 2, 120, texTest);
 		game->EndRender();
 	}
 
+	delete texTest;
 	game->Release();
 	return 0;
 }

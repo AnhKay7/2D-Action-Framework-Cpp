@@ -1,5 +1,7 @@
 #include "Game.h"
 #include "Debug.h"
+#include <cfloat>   // FLT_MAX
+#include <cmath>    // floorf
 
 #pragma comment(lib, "d3d10.lib")
 
@@ -64,6 +66,42 @@ bool CGame::Init(HWND hWnd, int bbWidth, int bbHeight)
 	vp.MaxDepth = 1.0f;
 	device->RSSetViewports(1, &vp);
 
+	hr = D3DX10CreateSprite(device, 0, &spriteObject);
+	if (FAILED(hr))
+	{
+		DebugOut(L"[ERROR] D3DX10CreateSprite failed 0x%08X\n", hr);
+		return false;
+	}
+
+	D3DXMATRIX matProjection;
+	D3DXMatrixOrthoOffCenterLH(&matProjection,
+		0.0f, (float)bbWidth,     // trái, phải
+		0.0f, (float)bbHeight,    // dưới, trên
+		0.1f, 10.0f);             // gần, xa (game 2D không quan tâm lắm)
+	spriteObject->SetProjectionTransform(&matProjection);
+
+	D3D10_BLEND_DESC bd = {};
+	bd.BlendEnable[0] = TRUE;
+	bd.SrcBlend = D3D10_BLEND_SRC_ALPHA;
+	bd.DestBlend = D3D10_BLEND_INV_SRC_ALPHA;
+	bd.BlendOp = D3D10_BLEND_OP_ADD;
+	bd.SrcBlendAlpha = D3D10_BLEND_ZERO;
+	bd.DestBlendAlpha = D3D10_BLEND_ZERO;
+	bd.BlendOpAlpha = D3D10_BLEND_OP_ADD;
+	bd.RenderTargetWriteMask[0] = D3D10_COLOR_WRITE_ENABLE_ALL;
+	device->CreateBlendState(&bd, &blendStateAlpha);
+
+	D3D10_SAMPLER_DESC sd2 = {};
+	sd2.Filter = D3D10_FILTER_MIN_MAG_MIP_POINT;
+	sd2.AddressU = D3D10_TEXTURE_ADDRESS_CLAMP;
+	sd2.AddressV = D3D10_TEXTURE_ADDRESS_CLAMP;
+	sd2.AddressW = D3D10_TEXTURE_ADDRESS_CLAMP;
+	sd2.MaxAnisotropy = 1;
+	sd2.ComparisonFunc = D3D10_COMPARISON_NEVER;
+	sd2.MinLOD = -FLT_MAX;
+	sd2.MaxLOD = FLT_MAX;
+	device->CreateSamplerState(&sd2, &pointSampler);
+
 	DebugOut(L"[INFO] Direct3D 10 OK, back buffer %dx%d\n", bbWidth, bbHeight);
 	return true;
 }
@@ -73,15 +111,113 @@ void CGame::BeginRender(float r, float g, float b)
 	float color[4] = { r, g, b, 1.0f };
 
 	device->ClearRenderTargetView(renderTargetView, color);
+
+	spriteObject->Begin(D3DX10_SPRITE_SORT_TEXTURE);    // cầm cọ lên
+
+	float blendFactor[4] = { 0, 0, 0, 0 };
+	device->OMSetBlendState(blendStateAlpha, blendFactor, 0xffffffff);  // bật giấy bóng kính
+	device->PSSetSamplers(0, 1, &pointSampler);
 }
 
 void CGame::EndRender()
 {
+	spriteObject->End();
 	swapChain->Present(1, 0);
+}
+
+CTexture* CGame::LoadTexture(LPCWSTR filePath)
+{
+	// 1. Đọc file PNG, chép vào kho của thợ vẽ
+	D3DX10_IMAGE_LOAD_INFO info = {};
+	info.Width = D3DX10_DEFAULT;          // DEFAULT = lấy đúng kích thước trong file
+	info.Height = D3DX10_DEFAULT;
+	info.Depth = D3DX10_DEFAULT;
+	info.FirstMipLevel = 0;
+	info.MipLevels = 1;                   // pixel art: chỉ cần 1 bản, không cần bản thu nhỏ
+	info.Usage = D3D10_USAGE_DEFAULT;
+	info.BindFlags = D3D10_BIND_SHADER_RESOURCE;
+	info.CpuAccessFlags = 0;
+	info.MiscFlags = 0;
+	info.Format = DXGI_FORMAT_R8G8B8A8_UNORM;   // 4 byte mỗi pixel, có alpha
+	info.Filter = D3DX10_FILTER_NONE;     // không co giãn, giữ nguyên pixel
+	info.MipFilter = D3DX10_FILTER_NONE;
+	info.pSrcInfo = NULL;
+
+	ID3D10Resource* resource = NULL;
+	HRESULT hr = D3DX10CreateTextureFromFile(device, filePath, &info, NULL, &resource, NULL);
+	if (FAILED(hr))
+	{
+		DebugOut(L"[ERROR] Khong nap duoc anh: %s (0x%08X)\n", filePath, hr);
+		return NULL;
+	}
+
+	// 2. "resource" là đồ chung chung, hỏi nó: mày có phải ảnh 2D không?
+	ID3D10Texture2D* tex = NULL;
+	resource->QueryInterface(__uuidof(ID3D10Texture2D), (void**)&tex);
+	resource->Release();
+	if (tex == NULL)
+	{
+		DebugOut(L"[ERROR] %s khong phai anh 2D\n", filePath);
+		return NULL;
+	}
+
+	// 3. Làm phiếu "dùng để dán"
+	ID3D10ShaderResourceView* view = NULL;
+	hr = device->CreateShaderResourceView(tex, NULL, &view);
+	if (FAILED(hr))
+	{
+		DebugOut(L"[ERROR] CreateShaderResourceView failed 0x%08X\n", hr);
+		tex->Release();
+		return NULL;
+	}
+
+	DebugOut(L"[INFO] Nap anh OK: %s\n", filePath);
+	return new CTexture(tex, view);
+}
+
+void CGame::Draw(float x, float y, CTexture* tex)
+{
+	if (tex == NULL) return;
+
+	D3DX10_SPRITE sprite = {};
+	sprite.pTexture = tex->GetView();
+	sprite.TexCoord.x = 0.0f;   // lấy ảnh từ góc trên trái...
+	sprite.TexCoord.y = 0.0f;
+	sprite.TexSize.x = 1.0f;    // ...tới hết ảnh (1.0 = 100% chiều rộng)
+	sprite.TexSize.y = 1.0f;
+	sprite.TextureIndex = 0;
+	sprite.ColorModulate = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);   // trắng = giữ nguyên màu ảnh
+
+	// D3DX vẽ mọi ảnh thành hình vuông 1x1 ở gốc toạ độ.
+	// Phải phóng to đúng kích thước ảnh, rồi dời tới chỗ cần vẽ.
+	D3DXMATRIX matScale, matMove;
+	D3DXMatrixScaling(&matScale, (float)tex->GetWidth(), (float)tex->GetHeight(), 1.0f);
+
+	// Làm tròn để pixel không bị nằm giữa hai ô (gây nhoè).
+	// Trục y của Direct3D hướng LÊN, còn mình muốn y hướng XUỐNG giống màn hình, nên lật lại.
+	D3DXMatrixTranslation(&matMove, floorf(x), backBufferHeight - floorf(y), 0.1f);
+
+	sprite.matWorld = matScale * matMove;   // phóng to trước, dời sau
+	spriteObject->DrawSpritesImmediate(&sprite, 1, 0, 0);
 }
 
 void CGame::Release()
 {
+	if (pointSampler)
+	{
+		pointSampler->Release();
+		pointSampler = NULL;
+	}
+	if (blendStateAlpha)
+	{
+		blendStateAlpha->Release();
+		blendStateAlpha = NULL;
+	}
+	if (spriteObject)
+	{
+		spriteObject->Release();
+		spriteObject = NULL;
+	}
 	if (renderTargetView)
 	{
 		renderTargetView->Release();
@@ -93,8 +229,8 @@ void CGame::Release()
 		swapChain = NULL;
 	}
 	if (device)
-	{ 
-		device->Release();           
-		device = NULL; 
+	{
+		device->Release();
+		device = NULL;
 	}
 }

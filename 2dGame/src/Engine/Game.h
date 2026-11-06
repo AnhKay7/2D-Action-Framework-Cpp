@@ -1,6 +1,8 @@
 #pragma once
 #include <Windows.h>
 #include <d3d10.h>
+#include <d3dx10.h>
+#include "Texture.h"
 
 class CGame
 {
@@ -15,6 +17,10 @@ private:
 	IDXGISwapChain* swapChain = NULL;
 	ID3D10RenderTargetView* renderTargetView = NULL;
 
+	ID3DX10Sprite* spriteObject = NULL;
+	ID3D10BlendState* blendStateAlpha = NULL;
+	ID3D10SamplerState* pointSampler = NULL;
+
 	CGame() {}
 
 public:
@@ -24,6 +30,9 @@ public:
 	void BeginRender(float r, float g, float b);
 	void EndRender();
 	void Release();
+
+	CTexture* LoadTexture(LPCWSTR filePath);
+	void Draw(float x, float y, CTexture* tex);
 
 	int GetBackBufferWidth() { return backBufferWidth; }
 	int GetBackBufferHeight() { return backBufferHeight; }
