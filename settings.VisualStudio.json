@@ -1,0 +1,5 @@
+/* Visual Studio Settings File */
+{
+  "intellicode.advanced.logging.suggestionsLogging": false,
+  "languages.cpp.intelliSense.enable64bitIntelliSense": true
+}
