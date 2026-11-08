@@ -1,6 +1,8 @@
 #include <Windows.h>
 #include "Engine/Debug.h"
 #include "Engine/Game.h"
+#include "Engine/Textures.h"
+#include "Engine/Sprites.h"
 
 #pragma comment(lib, "winmm.lib")
 
@@ -10,6 +12,10 @@
 #define SCREEN_HEIGHT 480
 #define BACKBUFFER_WIDTH  320
 #define BACKBUFFER_HEIGHT 240
+
+#define ID_TEX_PLAYER_IDLE   10
+#define ID_SPRITE_IDLE_BEGIN 1000   // khung 0 = 1000, khung 1 = 1001, ...
+#define PATH_TEX_PLAYER L"assets\\player\\Idle.png"
 
 LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
 {
@@ -55,12 +61,38 @@ HWND CreateGameWindow(HINSTANCE hInstance, int nCmdShow, int clientWidth, int cl
 	UpdateWindow(hWnd);
 	return hWnd;
 }
+
+
 float testX = 0.0f;
 float testVx = 0.1f;
 void Update(float dt) 
 {
 	testX += testVx * dt;
 	if (testX < 0 || testX > SCREEN_WIDTH) testVx = -testVx;
+}
+
+void LoadResources() 
+{
+	CTextures::GetInstance()->Add(ID_TEX_PLAYER_IDLE, PATH_TEX_PLAYER);
+
+	int idle_width = 1008 / 7;
+	int idle_height = 144;
+	for (int i = 0; i < 7; i++)
+	{
+		CSprites::GetInstance()->Add(ID_SPRITE_IDLE_BEGIN + i, 
+			idle_width * i, 0, idle_width, idle_height, CTextures::GetInstance()->Get(ID_TEX_PLAYER_IDLE));
+	}
+}
+void Render() 
+{
+	for (int i = 0; i < 7; i++)
+	{
+		CSprites::GetInstance()->Get(ID_SPRITE_IDLE_BEGIN + i)->Draw(40 * (i + 1), 80);
+	}
+	for (int i = 0; i < 7; i++)
+	{
+		CSprites::GetInstance()->Get(ID_SPRITE_IDLE_BEGIN + i)->Draw(40 * (i + 1), 160, true);
+	}
 }
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -74,7 +106,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	CGame* game = CGame::GetInstance();
 	if (!game->Init(hWnd, BACKBUFFER_WIDTH, BACKBUFFER_HEIGHT))
 		return 0;
-	CTexture* texTest = game->LoadTexture(L"assets\\test\\test.png");
+	LoadResources();
 	MSG msg = {};
 	bool running = true;
 	ULONGLONG last = GetTickCount64();
@@ -97,11 +129,12 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		DebugOutTitle(L"x = %.1f", testX);
 
 		game->BeginRender(testX / SCREEN_WIDTH, 0.2f, 0.4f);
-		game->Draw(testX / 2, 120, texTest);
+		Render();
 		game->EndRender();
 	}
 
-	delete texTest;
+	CSprites::GetInstance()->Clear();
+	CTextures::GetInstance()->Clear();
 	game->Release();
 	return 0;
 }

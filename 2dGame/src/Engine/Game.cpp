@@ -127,19 +127,18 @@ void CGame::EndRender()
 
 CTexture* CGame::LoadTexture(LPCWSTR filePath)
 {
-	// 1. Đọc file PNG, chép vào kho của thợ vẽ
 	D3DX10_IMAGE_LOAD_INFO info = {};
-	info.Width = D3DX10_DEFAULT;          // DEFAULT = lấy đúng kích thước trong file
+	info.Width = D3DX10_DEFAULT;          
 	info.Height = D3DX10_DEFAULT;
 	info.Depth = D3DX10_DEFAULT;
 	info.FirstMipLevel = 0;
-	info.MipLevels = 1;                   // pixel art: chỉ cần 1 bản, không cần bản thu nhỏ
+	info.MipLevels = 1;                   
 	info.Usage = D3D10_USAGE_DEFAULT;
 	info.BindFlags = D3D10_BIND_SHADER_RESOURCE;
 	info.CpuAccessFlags = 0;
 	info.MiscFlags = 0;
-	info.Format = DXGI_FORMAT_R8G8B8A8_UNORM;   // 4 byte mỗi pixel, có alpha
-	info.Filter = D3DX10_FILTER_NONE;     // không co giãn, giữ nguyên pixel
+	info.Format = DXGI_FORMAT_R8G8B8A8_UNORM;   
+	info.Filter = D3DX10_FILTER_NONE;     
 	info.MipFilter = D3DX10_FILTER_NONE;
 	info.pSrcInfo = NULL;
 
@@ -151,7 +150,6 @@ CTexture* CGame::LoadTexture(LPCWSTR filePath)
 		return NULL;
 	}
 
-	// 2. "resource" là đồ chung chung, hỏi nó: mày có phải ảnh 2D không?
 	ID3D10Texture2D* tex = NULL;
 	resource->QueryInterface(__uuidof(ID3D10Texture2D), (void**)&tex);
 	resource->Release();
@@ -161,7 +159,6 @@ CTexture* CGame::LoadTexture(LPCWSTR filePath)
 		return NULL;
 	}
 
-	// 3. Làm phiếu "dùng để dán"
 	ID3D10ShaderResourceView* view = NULL;
 	hr = device->CreateShaderResourceView(tex, NULL, &view);
 	if (FAILED(hr))
@@ -175,30 +172,56 @@ CTexture* CGame::LoadTexture(LPCWSTR filePath)
 	return new CTexture(tex, view);
 }
 
+void CGame::DrawSprite(float x, float y, int width, int height, D3DX10_SPRITE& sprite) 
+{
+	D3DXMATRIX matScale, matMove;
+	D3DXMatrixScaling(&matScale, (float) width, (float)height, 1.0f);
+
+	D3DXMatrixTranslation(&matMove, floorf(x), backBufferHeight - floorf(y), 0.1f);
+
+	sprite.matWorld = matScale * matMove;  
+	spriteObject->DrawSpritesImmediate(&sprite, 1, 0, 0);
+}
 void CGame::Draw(float x, float y, CTexture* tex)
 {
 	if (tex == NULL) return;
 
 	D3DX10_SPRITE sprite = {};
 	sprite.pTexture = tex->GetView();
-	sprite.TexCoord.x = 0.0f;   // lấy ảnh từ góc trên trái...
+	sprite.TexCoord.x = 0.0f;   
 	sprite.TexCoord.y = 0.0f;
-	sprite.TexSize.x = 1.0f;    // ...tới hết ảnh (1.0 = 100% chiều rộng)
+	sprite.TexSize.x = 1.0f;    
 	sprite.TexSize.y = 1.0f;
 	sprite.TextureIndex = 0;
-	sprite.ColorModulate = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);   // trắng = giữ nguyên màu ảnh
+	sprite.ColorModulate = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);   
 
-	// D3DX vẽ mọi ảnh thành hình vuông 1x1 ở gốc toạ độ.
-	// Phải phóng to đúng kích thước ảnh, rồi dời tới chỗ cần vẽ.
-	D3DXMATRIX matScale, matMove;
-	D3DXMatrixScaling(&matScale, (float)tex->GetWidth(), (float)tex->GetHeight(), 1.0f);
+	DrawSprite(x, y, tex->GetWidth(), tex->GetHeight(), sprite);
+}
+void CGame::DrawRegion(float x, float y, CTexture* tex,
+	int left, int top, int width, int height, bool flipX)
+{
+	if (tex == NULL) return;
 
-	// Làm tròn để pixel không bị nằm giữa hai ô (gây nhoè).
-	// Trục y của Direct3D hướng LÊN, còn mình muốn y hướng XUỐNG giống màn hình, nên lật lại.
-	D3DXMatrixTranslation(&matMove, floorf(x), backBufferHeight - floorf(y), 0.1f);
+	D3DX10_SPRITE sprite = {};
+	sprite.pTexture = tex->GetView();
+	sprite.TextureIndex = 0;
+	sprite.ColorModulate = D3DXCOLOR(1.0f, 1.0f, 1.0f, 1.0f);
 
-	sprite.matWorld = matScale * matMove;   // phóng to trước, dời sau
-	spriteObject->DrawSpritesImmediate(&sprite, 1, 0, 0);
+	float texW = (float)tex->GetWidth();
+	float texH = (float)tex->GetHeight();
+
+	sprite.TexCoord.x = left / texW;
+	sprite.TexCoord.y = top / texH;
+	sprite.TexSize.x = width / texW;
+	sprite.TexSize.y = height / texH;
+
+	if (flipX) 
+	{
+		sprite.TexCoord.x = (left + width) / texW;
+		sprite.TexSize.x = -sprite.TexSize.x;
+	}
+
+	DrawSprite(x, y, width, height, sprite);
 }
 
 void CGame::Release()

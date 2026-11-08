@@ -23,6 +23,8 @@ private:
 
 	CGame() {}
 
+	void DrawSprite(float x, float y, int width, int height, D3DX10_SPRITE& sprite);
+
 public:
 	static CGame* GetInstance();
 
@@ -33,6 +35,7 @@ public:
 
 	CTexture* LoadTexture(LPCWSTR filePath);
 	void Draw(float x, float y, CTexture* tex);
+	void DrawRegion(float x, float y, CTexture* tex, int left, int top, int width, int height, bool flipX = false);
 
 	int GetBackBufferWidth() { return backBufferWidth; }
 	int GetBackBufferHeight() { return backBufferHeight; }
