@@ -143,6 +143,8 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Game\Player.cpp" />
+    <ClCompile Include="src\Engine\GameObject.cpp" />
     <ClCompile Include="src\Engine\Input.cpp" />
     <ClCompile Include="src\Engine\Animator.cpp" />
     <ClCompile Include="src\Engine\Animations.cpp" />
@@ -156,6 +158,8 @@
     <ClCompile Include="src\Engine\Textures.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Game\Player.h" />
+    <ClInclude Include="src\Engine\GameObject.h" />
     <ClInclude Include="src\Engine\Input.h" />
     <ClInclude Include="src\Engine\Animator.h" />
     <ClInclude Include="src\Engine\Animations.h" />
