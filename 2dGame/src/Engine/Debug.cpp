@@ -1,4 +1,4 @@
-#include "Engine/Debug.h"
+#include "Debug.h"
 #include <cstdarg>
 #include <cstdio>
 
