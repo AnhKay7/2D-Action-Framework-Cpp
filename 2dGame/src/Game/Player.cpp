@@ -1,6 +1,7 @@
 #include "Player.h"
 #include "Engine/Game.h"
 #include "Engine/Input.h"
+#include "AssetIDs.h"
 
 void CPlayer::HandleInput()
 {
@@ -70,15 +71,15 @@ void CPlayer::SetState(int state)
 	{
 	case PLAYER_STATE_ATTACK:
 		vx = 0;
-		animator.Play(ID_ANI_ATTACK1, true);
+		animator.Play(ID_ANI_PLAYER_ATTACK1, true);
 		break;
 	case PLAYER_STATE_RUN:
 		vx = nx * PLAYER_RUN_SPEED;
-		animator.Play(ID_ANI_RUN, false);
+		animator.Play(ID_ANI_PLAYER_RUN, false);
 		break;
 	default:
 		vx = 0;
-		animator.Play(ID_ANI_IDLE, false);
+		animator.Play(ID_ANI_PLAYER_IDLE, false);
 		break;
 	}
 

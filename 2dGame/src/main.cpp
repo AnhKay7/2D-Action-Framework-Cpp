@@ -4,22 +4,21 @@
 #include "Engine/Textures.h"
 #include "Engine/Sprites.h"
 #include "Engine/Animations.h"
-#include "Engine/Animator.h"
 #include "Engine/Input.h"
+#include "Engine/PlayScene.h"
 
-#include <vector>
-#include "Game/Player.h"
 
 #pragma comment(lib, "winmm.lib")
 
 #define WINDOW_CLASS_NAME	L"2GameWindow"
 #define WINDOW_TITLE		L"2D Game - SE102"
-#define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 480
-#define BACKBUFFER_WIDTH  320
-#define BACKBUFFER_HEIGHT 240
 
-std::vector<CGameObject*> objects;
+#define SCREEN_WIDTH		640
+#define SCREEN_HEIGHT		480
+#define BACKBUFFER_WIDTH	320
+#define BACKBUFFER_HEIGHT	240
+
+CScene* scene = nullptr;
 
 LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
@@ -77,56 +76,6 @@ void Update(float dt)
 	testX += testVx * dt;
 	if (testX < 0 || testX > SCREEN_WIDTH)
 		testVx = -testVx;
-
-	for (CGameObject* gameObject : objects)
-	{
-		gameObject->Update(dt);
-	}
-}
-
-void AddStrip(int texId, int firstSpriteId, int count, int aniId, int frameTime, bool loop)
-{
-	CTexture* tex = CTextures::GetInstance()->Get(texId);
-	if (tex == NULL)
-		return;
-	CAnimation* ani = new CAnimation(loop);
-
-	for (int i = 0; i < count; i++)
-	{
-		CSprites::GetInstance()->Add(firstSpriteId + i, 144 * i + 19, 40, 98, 64, tex);
-		ani->AddFrame(firstSpriteId + i, frameTime);
-	}
-
-	CAnimations::GetInstance()->Add(aniId, ani);
-}
-void LoadResources()
-{
-	CTextures* texs = CTextures::GetInstance();
-
-	texs->Add(ID_TEX_IDLE, PATH_TEX_PLAYER_IDLE);
-	texs->Add(ID_TEX_RUN, PATH_TEX_PLAYER_RUN);
-	texs->Add(ID_TEX_ATTACK1, PATH_TEX_PLAYER_ATTACK1);
-
-	AddStrip(ID_TEX_IDLE, ID_SPRITE_IDLE, 7, ID_ANI_IDLE, 100, true);
-	AddStrip(ID_TEX_RUN, ID_SPRITE_RUN, 8, ID_ANI_RUN, 80, true);
-	AddStrip(ID_TEX_ATTACK1, ID_SPRITE_ATTACK1, 10, ID_ANI_ATTACK1, 60, false);
-
-	CGame* game = CGame::GetInstance();
-	float bbWidth = game->GetBackBufferWidth();
-	float bbHeight = game->GetBackBufferHeight();
-
-	objects.push_back(new CPlayer(bbWidth / 2, bbHeight / 2));
-	//playerAnim.Play(ID_ANI_IDLE, true);
-}
-void Render()
-{
-	//CGame* game = CGame::GetInstance();
-
-	for (CGameObject* gameObject : objects)
-	{
-		gameObject->Render();
-	}
-	//playerAnim.Render(playerX, playerY, facingLeft);
 }
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
@@ -141,7 +90,8 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	if (!game->Init(hWnd, BACKBUFFER_WIDTH, BACKBUFFER_HEIGHT))
 		return 0;
 	CInput::GetInstance()->Init(hWnd);
-	LoadResources();
+	scene = new CPlayScene();
+	scene->Load();
 	MSG msg = {};
 	bool running = true;
 	ULONGLONG last = GetTickCount64();
@@ -156,25 +106,24 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			DispatchMessage(&msg);
 		}
 
-		CInput::GetInstance()->Update();
 
 		ULONGLONG now = GetTickCount64();
 		float dt = (float)(now - last);
 		last = now;
+
+		CInput::GetInstance()->Update();
+		scene->Update((int)dt);
 		Update(dt);
 
 		DebugOutTitle(L"x = %.1f", testX);
 
 		game->BeginRender(testX / SCREEN_WIDTH, 0.2f, 0.4f);
-		Render();
+		scene->Render();
 		game->EndRender();
 	}
 
-	for (CGameObject* gameObject : objects)
-	{
-		delete gameObject;
-	}
-	objects.clear();
+	scene->Unload();
+	delete scene;
 
 	CAnimations::GetInstance()->Clear();
 	CSprites::GetInstance()->Clear();
