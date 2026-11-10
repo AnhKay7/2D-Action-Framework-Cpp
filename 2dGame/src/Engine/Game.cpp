@@ -1,7 +1,7 @@
 #include "Game.h"
 #include "Debug.h"
 #include <cfloat>   // FLT_MAX
-#include <cmath>    // floorf
+#include <cmath>    // roundf
 
 #pragma comment(lib, "d3d10.lib")
 
@@ -177,7 +177,7 @@ void CGame::DrawSprite(float x, float y, int width, int height, D3DX10_SPRITE& s
 	D3DXMATRIX matScale, matMove;
 	D3DXMatrixScaling(&matScale, (float) width, (float)height, 1.0f);
 
-	D3DXMatrixTranslation(&matMove, floorf(x), backBufferHeight - floorf(y), 0.1f);
+	D3DXMatrixTranslation(&matMove, roundf(x), backBufferHeight - roundf(y), 0.1f);
 
 	sprite.matWorld = matScale * matMove;  
 	spriteObject->DrawSpritesImmediate(&sprite, 1, 0, 0);

@@ -1,6 +1,9 @@
 #include "Player.h"
+
 #include "Engine/Game.h"
 #include "Engine/Input.h"
+#include "Engine/Collision.h"
+
 #include "AssetIDs.h"
 
 void CPlayer::HandleInput()
@@ -33,14 +36,18 @@ void CPlayer::HandleInput()
 
 CPlayer::CPlayer(float x, float y) : CGameObject(x, y) {}
 
-void CPlayer::Update(int dt)
+void CPlayer::Update(int dt, std::vector<CGameObject*>* coObjects)
 {
 	HandleInput();
 	
 	CGame* game = CGame::GetInstance();
 
-	x += vx * dt;
-	y += vy * dt;
+	vy += PLAYER_GRAVITY * dt;
+	if (vy > PLAYER_MAX_FALL_SPEED)
+		vy = PLAYER_MAX_FALL_SPEED;
+
+	isOnGround = false;
+	CCollision::Process(this, dt, coObjects);
 
 	//float l, t, r, b;
 	//GetBoundingBox(l, t, r, b);
@@ -49,10 +56,11 @@ void CPlayer::Update(int dt)
 	if (x < PLAYER_BBOX_WIDTH / 2)
 		x = PLAYER_BBOX_WIDTH / 2;
 
-	if (y + PLAYER_BBOX_HEIGHT / 2 > game->GetBackBufferHeight())
-		y = game->GetBackBufferHeight() - PLAYER_BBOX_HEIGHT / 2;
-	if (y < PLAYER_BBOX_HEIGHT / 2)
-		y = PLAYER_BBOX_HEIGHT / 2;
+	if (y > game->GetBackBufferHeight() + 50) 
+	{
+		SetPosition(160, 40);
+		vy = 0;
+	}
 
 	animator.Update(dt);
 
@@ -93,4 +101,19 @@ void CPlayer::GetBoundingBox(float& l, float& t, float& r, float& b)
 	
 	b = y + PLAYER_FEET_OFFSET;
 	t = b - PLAYER_BBOX_HEIGHT;
+}
+
+void CPlayer::OnCollisionWith(CCollisionEvent* e)
+{
+	if (e->ny < 0)
+	{
+		vy = 0;
+		isOnGround = true;
+	}
+
+	if (e->ny > 0)
+		vy = 0;
+
+	if (e->nx != 0)
+		vx = 0;
 }

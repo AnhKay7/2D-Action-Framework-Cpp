@@ -1,9 +1,10 @@
 #include "PlayScene.h"
-#include "Textures.h"
-#include "Animations.h"
-#include "Sprites.h"
-#include "Game.h"
-#include "Input.h"
+#include "Engine/Textures.h"
+#include "Engine/Animations.h"
+#include "Engine/Sprites.h"
+#include "Engine/Game.h"
+#include "Engine/Input.h"
+#include "Engine/Debug.h"
 
 #include "Game/AssetIDs.h"
 #include "Game/Player.h"
@@ -20,7 +21,7 @@ void AddStrip(int texId, int firstSpriteId, int count, int aniId, int frameTime,
 
 	for (int i = 0; i < count; i++)
 	{
-		CSprites::GetInstance()->Add(firstSpriteId + i, 144 * i + 19, 40, 98, 64, tex);
+		CSprites::GetInstance()->Add(firstSpriteId + i, 144 * i + 22, 40, 98, 64, tex);
 		ani->AddFrame(firstSpriteId + i, frameTime);
 	}
 
@@ -73,6 +74,9 @@ void CPlayScene::Load()
 
 	for (int i = 0; i < 20; i++)
 		objects.push_back(new CBrick(16 * i + 8, 128 + 8));
+
+	for (int i = 0; i < (bbHeight - 128 + 8) / 16; i++)
+		objects.push_back(new CBrick(bbWidth / 3, 128 + 8 - 16 * i));
 }
 
 void CPlayScene::Update(int dt)
@@ -95,10 +99,12 @@ void CPlayScene::Update(int dt)
 
 	for (CGameObject* obj : objects)
 	{
-		obj->Update(dt);
+		obj->Update(dt, &objects);
 	}
 
 	PurgeDeletedObjects();
+
+	DebugOutTitle(L"onGround=%d  vy=%.3f", player->IsOnGround(), player->GetVy());
 }
 
 void CPlayScene::Render()

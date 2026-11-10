@@ -11,8 +11,8 @@ class CPlayScene : public CScene
     CPlayer* player = nullptr;          // giữ riêng để sau này camera đi theo
     bool showBBox = false;
 
-    void LoadAssets();                  // texture, sprite, animation
-    void PurgeDeletedObjects();         // dọn các object đã Delete()
+    void LoadAssets();                  
+    void PurgeDeletedObjects();        
 
 public:
     void Load() override;

@@ -5,7 +5,8 @@
 #include "Engine/Sprites.h"
 #include "Engine/Animations.h"
 #include "Engine/Input.h"
-#include "Engine/PlayScene.h"
+
+#include "Game/PlayScene.h"
 
 
 #pragma comment(lib, "winmm.lib")
@@ -65,18 +66,6 @@ HWND CreateGameWindow(HINSTANCE hInstance, int nCmdShow, int clientWidth, int cl
 	return hWnd;
 }
 
-float testX = 0;
-float testVx = 0.01f;
-
-void Update(float dt)
-{
-	//if (CInput::GetInstance()->IsPressed('J'))  DebugOut(L"J pressed\n");
-	//if (CInput::GetInstance()->IsReleased('J')) DebugOut(L"J released\n");
-
-	testX += testVx * dt;
-	if (testX < 0 || testX > SCREEN_WIDTH)
-		testVx = -testVx;
-}
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	HWND hWnd = CreateGameWindow(hInstance, nCmdShow, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -111,13 +100,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		float dt = (float)(now - last);
 		last = now;
 
-		CInput::GetInstance()->Update();
-		scene->Update((int)dt);
-		Update(dt);
+		if (dt > 0)
+		{
+			CInput::GetInstance()->Update();
+			scene->Update((int)dt);
+		}
 
-		DebugOutTitle(L"x = %.1f", testX);
-
-		game->BeginRender(testX / SCREEN_WIDTH, 0.2f, 0.4f);
+		game->BeginRender(0.4f, 0.2f, 0.4f);
 		scene->Render();
 		game->EndRender();
 	}
