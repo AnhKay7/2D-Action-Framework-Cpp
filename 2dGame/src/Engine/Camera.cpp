@@ -7,6 +7,8 @@
 #define CAM_DZ_TOP      80     // ngoài [80, 160] theo dọc thì camera mới chạy
 #define CAM_DZ_BOTTOM  160
 
+#define CAM_SMOOTH 0.01
+
 void CCamera::ClampToBounds()
 {
 	if (x < left)
@@ -46,17 +48,19 @@ void CCamera::Update(float dt)
 	float tx, ty;
 	target->GetPosition(tx, ty);
 
-	float sx = tx - x;
+	float sx = tx - x, desiredX = x;
 	if (sx < CAM_DZ_LEFT)
-		x = tx - CAM_DZ_LEFT;
+		desiredX = tx - CAM_DZ_LEFT;
 	if (sx > CAM_DZ_RIGHT)
-		x = tx - CAM_DZ_RIGHT;
+		desiredX = tx - CAM_DZ_RIGHT;
 
 	float sy = ty - y;
 	if (sy < CAM_DZ_TOP)
 		y = ty - CAM_DZ_TOP;
 	if (sy > CAM_DZ_BOTTOM)
 		y = ty - CAM_DZ_BOTTOM;
+	
+	x += (desiredX - x) * min(1.0f,CAM_SMOOTH) * dt;
 
 	ClampToBounds();
 	Apply();

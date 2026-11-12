@@ -10,7 +10,7 @@
 
 #define PLAYER_RUN_SPEED        0.08f   
 #define PLAYER_JUMP_SPEED       0.23f // v^2 = 2 * g * h (g = 0.0005, h = 53)
-#define PLAYER_JUMP_CUT         0.5f 
+#define PLAYER_JUMP_CUT         0.35f 
 
 #define PLAYER_BBOX_WIDTH  12
 #define PLAYER_BBOX_HEIGHT 20
@@ -20,6 +20,10 @@
 #define PLAYER_GRAVITY         0.0005f   // px/ms², ≈ 9.81 * 5 unit/s² bên Unity
 #define PLAYER_MAX_FALL_SPEED  0.2f      // px/ms,  ≈ 20 unit/s bên Unity
 
+#define PLAYER_COYOTE_TIME       150.0f
+#define PLAYER_JUMP_BUFFER_TIME  150.0f
+
+
 class CPlayer : public CGameObject     
 {
 private:
@@ -28,6 +32,10 @@ private:
     void HandleInput();                
 
     bool isOnGround = false;
+
+    float coyoteTimer = 0;
+    float jumpBufferTimer = 0;
+
 public:
     CPlayer(float x, float y);
 
