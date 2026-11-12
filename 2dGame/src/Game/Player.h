@@ -2,12 +2,15 @@
 #include "Engine/GameObject.h"
 #include "Engine/Animator.h"
 
-#define PLAYER_STATE_IDLE    100
-#define PLAYER_STATE_RUN     200
-#define PLAYER_STATE_ATTACK  300
+#define PLAYER_STATE_IDLE       100
+#define PLAYER_STATE_RUN        200
+#define PLAYER_STATE_ATTACK     300
+#define PLAYER_STATE_JUMP       400
+#define PLAYER_STATE_FALL       500
 
-#define PLAYER_RUN_SPEED   0.08f   
-
+#define PLAYER_RUN_SPEED        0.08f   
+#define PLAYER_JUMP_SPEED       0.23f // v^2 = 2 * g * h (g = 0.0005, h = 53)
+#define PLAYER_JUMP_CUT         0.5f 
 
 #define PLAYER_BBOX_WIDTH  12
 #define PLAYER_BBOX_HEIGHT 20
@@ -28,7 +31,7 @@ private:
 public:
     CPlayer(float x, float y);
 
-    void Update(int dt, std::vector<CGameObject*>* coObjects) override;
+    void Update(float dt, std::vector<CGameObject*>* coObjects) override;
     void Render() override;
     void SetState(int state) override;
     void GetBoundingBox(float& l, float& t, float& r, float& b) override;

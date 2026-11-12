@@ -19,6 +19,9 @@
 #define BACKBUFFER_WIDTH	320
 #define BACKBUFFER_HEIGHT	240
 
+#define UPDATES_PER_SECOND 60
+#define FIXED_DT           (1000.0f / UPDATES_PER_SECOND)
+
 CScene* scene = nullptr;
 
 LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
@@ -83,7 +86,13 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	scene->Load();
 	MSG msg = {};
 	bool running = true;
-	ULONGLONG last = GetTickCount64();
+
+	LARGE_INTEGER freq, prev, now;
+	QueryPerformanceFrequency(&freq);  // đồng hồ chính xác cỡ micro giây
+	QueryPerformanceCounter(&prev);
+	const double STEP_MS = 1000.0 / UPDATES_PER_SECOND;   // 16.67 ms thật
+	double accumulator = 0;
+
 
 	while (running)
 	{
@@ -96,14 +105,17 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		}
 
 
-		ULONGLONG now = GetTickCount64();
-		float dt = (float)(now - last);
-		last = now;
+		QueryPerformanceCounter(&now);
+		double elapsed = (now.QuadPart - prev.QuadPart) * 1000.0 / freq.QuadPart;
+		prev = now;
+		if (elapsed > 250) elapsed = 250;   // kéo cửa sổ / dừng debugger: đừng chạy bù cả trăm lần
 
-		if (dt > 0)
+		accumulator += elapsed;
+		while (accumulator >= STEP_MS)
 		{
 			CInput::GetInstance()->Update();
-			scene->Update((int)dt);
+			scene->Update(FIXED_DT);
+			accumulator -= STEP_MS;
 		}
 
 		game->BeginRender(0.4f, 0.2f, 0.4f);

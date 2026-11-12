@@ -44,7 +44,7 @@ void CCollision::SweptAABB(
     else { ny = dy > 0 ? -1.0f : 1.0f; }   // trục Y chạm sau cùng → đụng mặt trên/dưới
 }
 
-void CCollision::Process(CGameObject* src, int dt, std::vector<CGameObject*>* coObjects)
+void CCollision::Process(CGameObject* src, float dt, std::vector<CGameObject*>* coObjects)
 {
     //float ml, mt, mr, mb;
     float x, y;

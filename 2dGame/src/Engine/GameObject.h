@@ -16,7 +16,7 @@ public:
     CGameObject(float x, float y) { this->x = x; this->y = y; }
     virtual ~CGameObject() {}
 
-    virtual void Update(int dt, std::vector<CGameObject*>* coObjects = nullptr) = 0;
+    virtual void Update(float dt, std::vector<CGameObject*>* coObjects = nullptr) = 0;
     virtual void Render() = 0;
     virtual void SetState(int state) { this->state = state; }
     virtual void GetBoundingBox(float& l, float& t, float& r, float& b) = 0;
