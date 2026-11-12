@@ -58,6 +58,11 @@ void CPlayScene::PurgeDeletedObjects()
 	{
 		if (obj->IsDeleted())
 		{
+			if (obj == player) 
+			{
+				player = nullptr;
+				camera.Follow(nullptr);
+			}
 			delete obj;
 			obj = nullptr;
 		}
@@ -77,14 +82,30 @@ void CPlayScene::Load()
 	player = new CPlayer(bbWidth / 2, bbHeight / 2);
 	objects.push_back(player);
 
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; (16 * i + 8) < MAP_RIGHT; i++)
+	{
+		if (i >= 30 && i <= 32)
+			continue;
 		objects.push_back(new CBrick(16 * i + 8, 128 + 8));
+	}
+
+	for (int i = 0; i < 4; i++)
+		objects.push_back(new CBrick(MAP_LEFT + BRICK_SIZE / 2, 128 - 16 * i));
+
+	for (int i = 0; i < 4; i++)
+		objects.push_back(new CBrick(MAP_RIGHT - BRICK_SIZE / 2, 128 - 16 * i));
 
 	for (int i = 0; i < 3; i++)
-		objects.push_back(new CBrick(bbWidth / 3, 128 + 8 - 16 * i));
+		objects.push_back(new CBrick(bbWidth / 3, 128 - 16 * i));
 
 	for (int i = 0; i < 3; i++)
 		objects.push_back(new CBrick(216 + 16 * i, 80));
+
+	camera.SetViewSize(bbWidth, bbHeight);
+	camera.SetBounds(MAP_LEFT, MAP_TOP, MAP_RIGHT, MAP_BOTTOM);
+	camera.Follow(player);
+	camera.SnapToTarget();
+	//game->SetCamPos(40, 0);
 }
 
 void CPlayScene::Update(float dt)
@@ -112,7 +133,10 @@ void CPlayScene::Update(float dt)
 
 	PurgeDeletedObjects();
 
-	DebugOutTitle(L"onGround=%d  vy=%.3f", player->IsOnGround(), player->GetVy());
+	camera.Update(dt);
+
+	if (player != nullptr)
+		DebugOutTitle(L"onGround=%d  vy=%.3f", player->IsOnGround(), player->GetVy());
 }
 
 void CPlayScene::Render()
@@ -133,4 +157,5 @@ void CPlayScene::Unload()
 	}
 	objects.clear();
 	player = nullptr;
+	camera.Follow(nullptr);
 }

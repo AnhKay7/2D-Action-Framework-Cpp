@@ -25,6 +25,7 @@ private:
 
 	void DrawSprite(float x, float y, int width, int height, D3DX10_SPRITE& sprite);
 
+	float camX = 0, camY = 0;
 public:
 	static CGame* GetInstance();
 
@@ -39,5 +40,8 @@ public:
 
 	int GetBackBufferWidth() { return backBufferWidth; }
 	int GetBackBufferHeight() { return backBufferHeight; }
+
+	void SetCamPos(float x, float y) { camX = x; camY = y; }
+	void GetCamPos(float& x, float& y) { x = camX; y = camY; }
 };
 

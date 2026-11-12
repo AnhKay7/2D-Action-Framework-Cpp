@@ -70,10 +70,6 @@ void CPlayer::Update(float dt, std::vector<CGameObject*>* coObjects)
 
 	//float l, t, r, b;
 	//GetBoundingBox(l, t, r, b);
-	if (x + PLAYER_BBOX_WIDTH / 2 > game->GetBackBufferWidth())
-		x = game->GetBackBufferWidth() - PLAYER_BBOX_WIDTH / 2;
-	if (x < PLAYER_BBOX_WIDTH / 2)
-		x = PLAYER_BBOX_WIDTH / 2;
 
 	if (y > game->GetBackBufferHeight() + 50) 
 	{

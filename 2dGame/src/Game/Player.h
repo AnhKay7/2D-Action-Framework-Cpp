@@ -40,4 +40,5 @@ public:
 
     bool IsOnGround() { return isOnGround; }
     float GetVy() { return vy; }
+    void SetSpeed(float vx, float vy) { this->vx = vx; this->vy = vy; }
 };
