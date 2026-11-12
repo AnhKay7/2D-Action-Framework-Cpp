@@ -34,10 +34,15 @@ void CPlayScene::LoadAssets()
 	texs->Add(ID_TEX_PLAYER_IDLE, TEX_PATH_PLAYER_IDLE);
 	texs->Add(ID_TEX_PLAYER_RUN, TEX_PATH_PLAYER_RUN);
 	texs->Add(ID_TEX_PLAYER_ATTACK1, TEX_PATH_PLAYER_ATTACK1);
+	texs->Add(ID_TEX_PLAYER_JUMP, TEX_PATH_PLAYER_JUMP);
+	texs->Add(ID_TEX_PLAYER_FALL, TEX_PATH_PLAYER_FALL);
 
 	AddStrip(ID_TEX_PLAYER_IDLE, ID_SPRITE_PLAYER_IDLE, 7, ID_ANI_PLAYER_IDLE, 100, true);
 	AddStrip(ID_TEX_PLAYER_RUN, ID_SPRITE_PLAYER_RUN, 8, ID_ANI_PLAYER_RUN, 80, true);
 	AddStrip(ID_TEX_PLAYER_ATTACK1, ID_SPRITE_PLAYER_ATTACK1, 10, ID_ANI_PLAYER_ATTACK1, 60, false);
+	AddStrip(ID_TEX_PLAYER_JUMP, ID_SPRITE_PLAYER_JUMP, 4, ID_ANI_PLAYER_JUMP, 80, false);
+	AddStrip(ID_TEX_PLAYER_FALL, ID_SPRITE_PLAYER_FALL, 4, ID_ANI_PLAYER_FALL, 80, true);
+
 
 	texs->Add(ID_TEX_BRICK, TEX_PATH_BRICK);
 	texs->Add(ID_TEX_BBOX, TEX_PATH_BBOX);
@@ -75,11 +80,14 @@ void CPlayScene::Load()
 	for (int i = 0; i < 20; i++)
 		objects.push_back(new CBrick(16 * i + 8, 128 + 8));
 
-	for (int i = 0; i < (bbHeight - 128 + 8) / 16; i++)
+	for (int i = 0; i < 3; i++)
 		objects.push_back(new CBrick(bbWidth / 3, 128 + 8 - 16 * i));
+
+	for (int i = 0; i < 3; i++)
+		objects.push_back(new CBrick(216 + 16 * i, 80));
 }
 
-void CPlayScene::Update(int dt)
+void CPlayScene::Update(float dt)
 {
 	CInput* input = CInput::GetInstance();
 

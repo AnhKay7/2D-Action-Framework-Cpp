@@ -16,7 +16,7 @@ class CPlayScene : public CScene
 
 public:
     void Load() override;
-    void Update(int dt) override;
+    void Update(float dt) override;
     void Render() override;
     void Unload() override;
 };

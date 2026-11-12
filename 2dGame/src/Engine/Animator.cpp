@@ -12,7 +12,7 @@ void CAnimator::Play(int aniId, bool restart)
 	finished = false;
 }
 
-void CAnimator::Update(int dt)
+void CAnimator::Update(float dt)
 {
 
 	if (aniId == -1)

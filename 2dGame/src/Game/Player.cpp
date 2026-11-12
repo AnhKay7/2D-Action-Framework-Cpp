@@ -12,21 +12,40 @@ void CPlayer::HandleInput()
 		return;
 
 	CInput* input = CInput::GetInstance();
-	if (input->IsPressed('X'))
-	{
-		SetState(PLAYER_STATE_ATTACK);
-		return;
-	}
 
 	int moveDirection = 0;
 	if (input->IsHeld(VK_RIGHT) || input->IsHeld('D'))
 		moveDirection += 1;
 	if (input->IsHeld(VK_LEFT) || input->IsHeld('A'))
 		moveDirection -= 1;
+	if (moveDirection != 0)
+		nx = moveDirection;
+	vx = moveDirection * PLAYER_RUN_SPEED;
+
+	if (input->IsPressed('X'))
+	{
+		SetState(PLAYER_STATE_ATTACK);
+		return;
+	}
+	if (input->IsPressed('Z') && isOnGround)
+	{
+		SetState(PLAYER_STATE_JUMP);
+		return;
+	}
+
+	if (!isOnGround)
+	{
+		if (input->IsReleased('Z') && vy < 0)
+			vy *= PLAYER_JUMP_CUT;
+		if (vy < 0)
+			SetState(PLAYER_STATE_JUMP);
+		else
+			SetState(PLAYER_STATE_FALL);
+		return;
+	}
 
 	if (moveDirection != 0)
 	{
-		nx = moveDirection;
 		SetState(PLAYER_STATE_RUN);
 		return;
 	}
@@ -36,7 +55,7 @@ void CPlayer::HandleInput()
 
 CPlayer::CPlayer(float x, float y) : CGameObject(x, y) {}
 
-void CPlayer::Update(int dt, std::vector<CGameObject*>* coObjects)
+void CPlayer::Update(float dt, std::vector<CGameObject*>* coObjects)
 {
 	HandleInput();
 	
@@ -73,25 +92,33 @@ void CPlayer::Render()
 	animator.Render(x, y, nx < 0);
 }
 
-void CPlayer::SetState(int state)
+void CPlayer::SetState(int newState)
 {
-	switch (state)
+	if (newState == state)
+		return;
+
+	switch (newState)
 	{
 	case PLAYER_STATE_ATTACK:
 		vx = 0;
 		animator.Play(ID_ANI_PLAYER_ATTACK1, true);
 		break;
 	case PLAYER_STATE_RUN:
-		vx = nx * PLAYER_RUN_SPEED;
 		animator.Play(ID_ANI_PLAYER_RUN, false);
 		break;
+	case PLAYER_STATE_JUMP:
+		vy = -PLAYER_JUMP_SPEED;
+		animator.Play(ID_ANI_PLAYER_JUMP, true);
+		break;
+	case PLAYER_STATE_FALL:
+		animator.Play(ID_ANI_PLAYER_FALL, false);
+		break;
 	default:
-		vx = 0;
 		animator.Play(ID_ANI_PLAYER_IDLE, false);
 		break;
 	}
 
-	CGameObject::SetState(state);
+	CGameObject::SetState(newState);
 }
 
 void CPlayer::GetBoundingBox(float& l, float& t, float& r, float& b)

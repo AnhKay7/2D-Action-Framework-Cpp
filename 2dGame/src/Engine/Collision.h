@@ -23,7 +23,7 @@ public:
         float& t, float& nx, float& ny);
 
     // Di chuyển src theo vận tốc của nó trong dt, bị chặn bởi các object IsBlock()
-    static void Process(CGameObject* src, int dt, std::vector<CGameObject*>* coObjects);
+    static void Process(CGameObject* src, float dt, std::vector<CGameObject*>* coObjects);
 
 private:
     // Tìm vật chạm SỚM NHẤT khi src đi quãng (dx, dy). Có thì trả true và điền hit
