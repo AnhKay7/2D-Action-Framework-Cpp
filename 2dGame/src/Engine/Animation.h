@@ -3,15 +3,14 @@
 
 struct CAnimationFrame
 {
-    int spriteId;    // thẻ nào
-    int duration;    // hiện bao nhiêu ms
+    int spriteId;    
+    int duration;    
 };
 
-// Kịch bản: chỉ chứa dữ liệu, không biết "đang chạy tới đâu"
 class CAnimation
 {
 private:
-    std::vector<CAnimationFrame> frames;   // giống List<Frame> bên C#
+    std::vector<CAnimationFrame> frames;   
     bool loop;
 public:
     CAnimation(bool loop = true) { this->loop = loop; }

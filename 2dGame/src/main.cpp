@@ -4,34 +4,24 @@
 #include "Engine/Textures.h"
 #include "Engine/Sprites.h"
 #include "Engine/Animations.h"
-#include "Engine/Animator.h"
+#include "Engine/Input.h"
+
+#include "Game/PlayScene.h"
+
 
 #pragma comment(lib, "winmm.lib")
 
 #define WINDOW_CLASS_NAME	L"2GameWindow"
 #define WINDOW_TITLE		L"2D Game - SE102"
-#define SCREEN_WIDTH 640
-#define SCREEN_HEIGHT 480
-#define BACKBUFFER_WIDTH  320
-#define BACKBUFFER_HEIGHT 240
 
-#define ID_TEX_IDLE    10
-#define ID_TEX_RUN     11
-#define ID_TEX_ATTACK1 12
+#define SCREEN_WIDTH		640
+#define SCREEN_HEIGHT		480
+#define BACKBUFFER_WIDTH	320
+#define BACKBUFFER_HEIGHT	240
 
-#define ID_SPRITE_IDLE    1000   // 1000..1006
-#define ID_SPRITE_RUN     1100   // 1100..1107
-#define ID_SPRITE_ATTACK1 1200   // 1200..1209
+CScene* scene = nullptr;
 
-#define ID_ANI_IDLE    1
-#define ID_ANI_RUN     2
-#define ID_ANI_ATTACK1 3
-
-#define PATH_TEX_PLAYER_IDLE L"assets\\player\\Idle.png"
-#define PATH_TEX_PLAYER_RUN L"assets\\player\\Run.png"
-#define PATH_TEX_PLAYER_ATTACK1 L"assets\\player\\Attack1.png"
-
-LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam) 
+LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 {
 	switch (message) {
 	case WM_DESTROY:
@@ -40,7 +30,7 @@ LRESULT CALLBACK WinProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
 	}
 	return DefWindowProc(hWnd, message, wParam, lParam);
 }
-HWND CreateGameWindow(HINSTANCE hInstance, int nCmdShow, int clientWidth, int clientHeight) 
+HWND CreateGameWindow(HINSTANCE hInstance, int nCmdShow, int clientWidth, int clientHeight)
 {
 	WNDCLASSEXW wc = {};
 	wc.cbSize = sizeof(WNDCLASSEXW);
@@ -50,7 +40,7 @@ HWND CreateGameWindow(HINSTANCE hInstance, int nCmdShow, int clientWidth, int cl
 	wc.hCursor = LoadCursor(NULL, IDC_ARROW);
 	wc.hbrBackground = (HBRUSH)GetStockObject(BLACK_BRUSH);
 	wc.lpszClassName = WINDOW_CLASS_NAME;
-	if (!RegisterClassExW(&wc)){
+	if (!RegisterClassExW(&wc)) {
 		DebugOut(L"[ERROR] RegisterClassEx failed\n");
 		return NULL;
 	}
@@ -65,7 +55,7 @@ HWND CreateGameWindow(HINSTANCE hInstance, int nCmdShow, int clientWidth, int cl
 		NULL, NULL, hInstance, NULL
 	);
 
-	if (hWnd == NULL) 
+	if (hWnd == NULL)
 	{
 		DebugOut(L"[ERROR] Create Window failed\n");
 		return NULL;
@@ -76,82 +66,10 @@ HWND CreateGameWindow(HINSTANCE hInstance, int nCmdShow, int clientWidth, int cl
 	return hWnd;
 }
 
-CAnimator idleAnim, idleAnim2, runAnim, attackAnim;
-
-float testX = 0.0f;
-float testVx = 0.1f;
-float attackTimer = 0;
-float idle2Timer = 0;
-bool isPlayedIdle2 = false;
-void Update(float dt) 
-{
-	testX += testVx * dt;
-	if (testX < 0 || testX > SCREEN_WIDTH)
-		testVx = -testVx;
-
-	attackTimer += dt;
-	if (attackTimer >= 2000)
-	{
-		attackAnim.Play(ID_ANI_ATTACK1, true);
-		attackTimer = 0;
-	}
-	if (idle2Timer >= 350 && !isPlayedIdle2)
-	{
-		idleAnim2.Play(ID_ANI_IDLE, true);
-		isPlayedIdle2 = true;
-	}
-	else idle2Timer += dt;
-
-	idleAnim.Update(dt);
-	idleAnim2.Update(dt);
-	runAnim.Update(dt);
-	attackAnim.Update(dt);
-}
-
-void AddStrip(int texId, int firstSpriteId, int count, int aniId, int frameTime, bool loop)
-{
-	CTexture* tex = CTextures::GetInstance()->Get(texId);
-	if (tex == NULL)
-		return;
-	CAnimation* ani = new CAnimation(loop);
-
-	for (int i = 0; i < count; i++)
-	{
-		CSprites::GetInstance()->Add(firstSpriteId + i, 144 * i, 0, 144, 144, tex);
-		ani->AddFrame(firstSpriteId + i, frameTime);
-	}
-
-	CAnimations::GetInstance()->Add(aniId, ani);
-}
-void LoadResources() 
-{
-	CTextures* texs = CTextures::GetInstance();
-
-	texs->Add(ID_TEX_IDLE, PATH_TEX_PLAYER_IDLE);
-	texs->Add(ID_TEX_RUN, PATH_TEX_PLAYER_RUN);
-	texs->Add(ID_TEX_ATTACK1, PATH_TEX_PLAYER_ATTACK1);
-
-	AddStrip(ID_TEX_IDLE, ID_SPRITE_IDLE, 7, ID_ANI_IDLE, 100, true);
-	AddStrip(ID_TEX_RUN, ID_SPRITE_RUN, 8, ID_ANI_RUN, 80, true);
-	AddStrip(ID_TEX_ATTACK1, ID_SPRITE_ATTACK1, 10, ID_ANI_ATTACK1, 60, false);
-
-	idleAnim.Play(ID_ANI_IDLE, true);
-	runAnim.Play(ID_ANI_RUN, true);
-	attackAnim.Play(ID_ANI_ATTACK1, true);
-}
-void Render() 
-{
-	
-	CGame* game = CGame::GetInstance();
-	idleAnim.Render(game->GetBackBufferWidth() / 5, game->GetBackBufferHeight() / 2);
-	idleAnim2.Render(game->GetBackBufferWidth() / 5 * 2, game->GetBackBufferHeight() / 2);
-	runAnim.Render(game->GetBackBufferWidth() / 5 * 3, game->GetBackBufferHeight() / 2);
-	attackAnim.Render(game->GetBackBufferWidth() / 5 * 4, game->GetBackBufferHeight() / 2);
-}
 int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine, int nCmdShow)
 {
 	HWND hWnd = CreateGameWindow(hInstance, nCmdShow, SCREEN_WIDTH, SCREEN_HEIGHT);
-	if (hWnd == NULL) 
+	if (hWnd == NULL)
 	{
 		return 0;
 	}
@@ -160,12 +78,14 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	CGame* game = CGame::GetInstance();
 	if (!game->Init(hWnd, BACKBUFFER_WIDTH, BACKBUFFER_HEIGHT))
 		return 0;
-	LoadResources();
+	CInput::GetInstance()->Init(hWnd);
+	scene = new CPlayScene();
+	scene->Load();
 	MSG msg = {};
 	bool running = true;
 	ULONGLONG last = GetTickCount64();
 
-	while (running) 
+	while (running)
 	{
 		while (PeekMessage(&msg, NULL, 0, 0, PM_REMOVE))
 		{
@@ -175,17 +95,25 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 			DispatchMessage(&msg);
 		}
 
+
 		ULONGLONG now = GetTickCount64();
 		float dt = (float)(now - last);
 		last = now;
-		Update(dt);
 
-		DebugOutTitle(L"x = %.1f", testX);
+		if (dt > 0)
+		{
+			CInput::GetInstance()->Update();
+			scene->Update((int)dt);
+		}
 
-		game->BeginRender(testX / SCREEN_WIDTH, 0.2f, 0.4f);
-		Render();
+		game->BeginRender(0.4f, 0.2f, 0.4f);
+		scene->Render();
 		game->EndRender();
 	}
+
+	scene->Unload();
+	delete scene;
+
 	CAnimations::GetInstance()->Clear();
 	CSprites::GetInstance()->Clear();
 	CTextures::GetInstance()->Clear();

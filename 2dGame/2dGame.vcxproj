@@ -143,6 +143,11 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Engine\Collision.cpp" />
+    <ClCompile Include="src\Game\Brick.cpp" />
+    <ClCompile Include="src\Game\Player.cpp" />
+    <ClCompile Include="src\Engine\GameObject.cpp" />
+    <ClCompile Include="src\Engine\Input.cpp" />
     <ClCompile Include="src\Engine\Animator.cpp" />
     <ClCompile Include="src\Engine\Animations.cpp" />
     <ClCompile Include="src\Engine\Animation.cpp" />
@@ -150,11 +155,19 @@
     <ClCompile Include="src\Engine\Sprite.cpp" />
     <ClCompile Include="src\Engine\Game.cpp" />
     <ClCompile Include="src\Engine\Debug.cpp" />
+    <ClCompile Include="src\Game\PlayScene.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Engine\Texture.cpp" />
     <ClCompile Include="src\Engine\Textures.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Engine\Collision.h" />
+    <ClInclude Include="src\Engine\Scene.h" />
+    <ClInclude Include="src\Game\Brick.h" />
+    <ClInclude Include="src\Game\AssetIDs.h" />
+    <ClInclude Include="src\Game\Player.h" />
+    <ClInclude Include="src\Engine\GameObject.h" />
+    <ClInclude Include="src\Engine\Input.h" />
     <ClInclude Include="src\Engine\Animator.h" />
     <ClInclude Include="src\Engine\Animations.h" />
     <ClInclude Include="src\Engine\Animation.h" />
@@ -164,9 +177,14 @@
     <ClInclude Include="src\Engine\Debug.h" />
     <ClInclude Include="src\Engine\Texture.h" />
     <ClInclude Include="src\Engine\Textures.h" />
+    <ClInclude Include="src\Game\PlayScene.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="assets\debug\bbox.png" />
+    <Image Include="assets\tiles\brick.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
