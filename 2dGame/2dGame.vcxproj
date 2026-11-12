@@ -143,6 +143,7 @@
     </Manifest>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="src\Engine\Camera.cpp" />
     <ClCompile Include="src\Engine\Collision.cpp" />
     <ClCompile Include="src\Game\Brick.cpp" />
     <ClCompile Include="src\Game\Player.cpp" />
@@ -161,6 +162,7 @@
     <ClCompile Include="src\Engine\Textures.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="src\Engine\Camera.h" />
     <ClInclude Include="src\Engine\Collision.h" />
     <ClInclude Include="src\Engine\Scene.h" />
     <ClInclude Include="src\Game\Brick.h" />

@@ -177,7 +177,9 @@ void CGame::DrawSprite(float x, float y, int width, int height, D3DX10_SPRITE& s
 	D3DXMATRIX matScale, matMove;
 	D3DXMatrixScaling(&matScale, (float) width, (float)height, 1.0f);
 
-	D3DXMatrixTranslation(&matMove, roundf(x), backBufferHeight - roundf(y), 0.1f);
+	float sx = roundf(x) - roundf(camX);    
+	float sy = roundf(y) - roundf(camY);
+	D3DXMatrixTranslation(&matMove, sx, backBufferHeight - sy, 0.1f);
 
 	sprite.matWorld = matScale * matMove;  
 	spriteObject->DrawSpritesImmediate(&sprite, 1, 0, 0);

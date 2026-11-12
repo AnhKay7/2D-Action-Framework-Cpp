@@ -8,10 +8,12 @@
 
 void CPlayer::HandleInput()
 {
-	if (state == PLAYER_STATE_ATTACK)
-		return;
-
 	CInput* input = CInput::GetInstance();
+
+	if (input->IsPressed('Z'))
+		jumpBufferTimer = PLAYER_JUMP_BUFFER_TIME;
+	if (isOnGround)
+		coyoteTimer = PLAYER_COYOTE_TIME;
 
 	int moveDirection = 0;
 	if (input->IsHeld(VK_RIGHT) || input->IsHeld('D'))
@@ -20,16 +22,18 @@ void CPlayer::HandleInput()
 		moveDirection -= 1;
 	if (moveDirection != 0)
 		nx = moveDirection;
+
+	if (state == PLAYER_STATE_ATTACK)
+		return;
 	vx = moveDirection * PLAYER_RUN_SPEED;
 
-	if (input->IsPressed('X'))
-	{
-		SetState(PLAYER_STATE_ATTACK);
-		return;
-	}
-	if (input->IsPressed('Z') && isOnGround)
+	if (jumpBufferTimer > 0 && coyoteTimer > 0)
 	{
 		SetState(PLAYER_STATE_JUMP);
+		if (!input->IsHeld('Z'))
+			vy *= PLAYER_JUMP_CUT;
+		coyoteTimer = 0;
+		jumpBufferTimer = 0;
 		return;
 	}
 
@@ -41,6 +45,12 @@ void CPlayer::HandleInput()
 			SetState(PLAYER_STATE_JUMP);
 		else
 			SetState(PLAYER_STATE_FALL);
+		return;
+	}
+
+	if (input->IsPressed('X'))
+	{
+		SetState(PLAYER_STATE_ATTACK);
 		return;
 	}
 
@@ -57,6 +67,11 @@ CPlayer::CPlayer(float x, float y) : CGameObject(x, y) {}
 
 void CPlayer::Update(float dt, std::vector<CGameObject*>* coObjects)
 {
+	if (jumpBufferTimer > 0)
+		jumpBufferTimer -= dt;
+	if (coyoteTimer > 0)
+		coyoteTimer -= dt;
+
 	HandleInput();
 	
 	CGame* game = CGame::GetInstance();
@@ -70,10 +85,6 @@ void CPlayer::Update(float dt, std::vector<CGameObject*>* coObjects)
 
 	//float l, t, r, b;
 	//GetBoundingBox(l, t, r, b);
-	if (x + PLAYER_BBOX_WIDTH / 2 > game->GetBackBufferWidth())
-		x = game->GetBackBufferWidth() - PLAYER_BBOX_WIDTH / 2;
-	if (x < PLAYER_BBOX_WIDTH / 2)
-		x = PLAYER_BBOX_WIDTH / 2;
 
 	if (y > game->GetBackBufferHeight() + 50) 
 	{
