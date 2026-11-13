@@ -136,7 +136,8 @@ void CPlayScene::Update(float dt)
 	camera.Update(dt);
 
 	if (player != nullptr)
-		DebugOutTitle(L"onGround=%d  vy=%.3f", player->IsOnGround(), player->GetVy());
+		DebugOutTitle(L"onGround=%d  vy=%.3f  touchingWall=%d  wallDir=%d",
+			player->IsOnGround(), player->GetVy(), player->IsTouchingWall(), player->GetWallDirection());
 }
 
 void CPlayScene::Render()
