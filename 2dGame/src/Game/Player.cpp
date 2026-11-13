@@ -219,20 +219,18 @@ void CPlayer::CheckWalls(std::vector<CGameObject*>* coObjects)
 			overlapRight = true;
 		if (CCollision::Overlap(pl - PLAYER_SENSOR_SKIN, pt, pl, pb, wl, wt, wr, wb))
 			overlapLeft = true;
-
-		if (overlapRight)
-		{
-			isTouchingWall = true;
-			wallDir = 1;
-		}
-		else if (overlapLeft)
-		{
-			isTouchingWall = true;
-			wallDir = -1;
-		}
-		else
-		{
-			isTouchingWall = false;
-		}
 	}
+
+	if (overlapRight)
+	{
+		isTouchingWall = true;
+		wallDir = 1;
+	}
+	else if (overlapLeft)
+	{
+		isTouchingWall = true;
+		wallDir = -1;
+	}
+	else
+		isTouchingWall = false;
 }
