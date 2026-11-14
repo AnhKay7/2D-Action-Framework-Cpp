@@ -160,16 +160,6 @@ void CPlayer::Update(float dt, std::vector<CGameObject*>* coObjects)
 				vy = PLAYER_MAX_FALL_SPEED;
 	}
 
-
-	if (state == PLAYER_STATE_WALL_SLIDE)
-	{
-		if (vy > PLAYER_WALL_SLIDE_SPEED)
-			vy = PLAYER_WALL_SLIDE_SPEED;
-	}
-	else
-		if (vy > PLAYER_MAX_FALL_SPEED)
-			vy = PLAYER_MAX_FALL_SPEED;
-
 	CCollision::Process(this, dt, coObjects);
 
 	if (y > game->GetBackBufferHeight() + 50)
@@ -251,12 +241,7 @@ void CPlayer::GetBoundingBox(float& l, float& t, float& r, float& b)
 
 void CPlayer::OnCollisionWith(CCollisionEvent* e)
 {
-	if (e->ny < 0)
-	{
-		vy = 0;
-	}
-
-	if (e->ny > 0)
+	if (e->ny != 0)
 		vy = 0;
 
 	if (e->nx != 0)
