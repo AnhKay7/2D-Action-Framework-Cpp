@@ -8,24 +8,36 @@
 
 void CPlayer::HandleInput()
 {
-	CInput* input = CInput::GetInstance();
+	ReadInput();
 
-	if (input->IsPressed('Z'))
+	if (in.jumpPressed)
 		jumpBufferTimer = PLAYER_JUMP_BUFFER_TIME;
+	if (in.dashPressed)
+		dashBufferTimer = PLAYER_DASH_BUFFER_TIME;
 	if (isOnGround)
 		coyoteTimer = PLAYER_COYOTE_TIME;
 	if (!isOnGround && isTouchingWall)
 		wallCoyoteTimer = PLAYER_WALL_COYOTE_TIME;
+	if (isOnGround || isTouchingWall)
+		airDashChargeLeft = PLAYER_MAX_AIR_DASHES;
 
-	int moveDirection = 0;
-	if (input->IsHeld(VK_RIGHT) || input->IsHeld('D'))
-		moveDirection += 1;
-	if (input->IsHeld(VK_LEFT) || input->IsHeld('A'))
-		moveDirection -= 1;
+	int moveDirection = in.moveDir;
 
 	if (state == PLAYER_STATE_ATTACK)
 		return;
+	if (state == PLAYER_STATE_DASH && dashTimer > 0)
+		return;
 
+	if (dashBufferTimer > 0 && dashCooldownTimer <= 0 && airDashChargeLeft > 0)
+	{
+		if (state == PLAYER_STATE_WALL_SLIDE)
+			dashDir = -wallDir;
+		else
+			dashDir = moveDirection != 0 ? moveDirection : nx;
+		dashBufferTimer = 0;
+		SetState(PLAYER_STATE_DASH);
+		return;
+	}
 	if (state != PLAYER_STATE_WALL_JUMP || wallJumpTimer <= 0)
 	{
 		if (moveDirection != 0)
@@ -38,7 +50,7 @@ void CPlayer::HandleInput()
 		coyoteTimer = 0;
 		jumpBufferTimer = 0;
 		SetState(PLAYER_STATE_JUMP);
-		if (!input->IsHeld('Z'))
+		if (!in.jumpHeld)
 			vy *= PLAYER_JUMP_CUT;
 		return;
 	}
@@ -49,18 +61,18 @@ void CPlayer::HandleInput()
 		wallCoyoteTimer = 0;
 		wallJumpTimer = PLAYER_WALL_JUMP_LOCK;
 		SetState(PLAYER_STATE_WALL_JUMP);
-		if (!input->IsHeld('Z'))
+		if (!in.jumpHeld)
 			vy *= PLAYER_JUMP_CUT;
 		return;
 	}
 
 	if (!isOnGround)
 	{
-		if (input->IsReleased('Z') && vy < 0)
+		if (in.jumpReleased && vy < 0)
 			vy *= PLAYER_JUMP_CUT;
 		if (state == PLAYER_STATE_WALL_JUMP && vy < 0)
 			return;
-		if (vy >= 0 && isTouchingWall && moveDirection != -wallDir) 
+		if (vy >= 0 && isTouchingWall && moveDirection != -wallDir)
 		{
 			SetState(PLAYER_STATE_WALL_SLIDE);
 			return;
@@ -73,7 +85,7 @@ void CPlayer::HandleInput()
 		return;
 	}
 
-	if (input->IsPressed('X'))
+	if (in.attackPressed)
 	{
 		SetState(PLAYER_STATE_ATTACK);
 		return;
@@ -86,6 +98,22 @@ void CPlayer::HandleInput()
 	}
 
 	SetState(PLAYER_STATE_IDLE);
+}
+
+void CPlayer::ReadInput()
+{
+	in = PlayerInput();
+	if (!inputEnabled)
+		return;
+
+	CInput* input = CInput::GetInstance();
+
+	in.moveDir = input->IsHeld(KEY_MOVE_RIGHT) - input->IsHeld(KEY_MOVE_LEFT);
+	in.jumpPressed = input->IsPressed(KEY_JUMP);
+	in.jumpHeld = input->IsHeld(KEY_JUMP);
+	in.jumpReleased = input->IsReleased(KEY_JUMP);
+	in.attackPressed = input->IsPressed(KEY_ATTACK);
+	in.dashPressed = input->IsPressed(KEY_DASH);
 }
 
 CPlayer::CPlayer(float x, float y) : CGameObject(x, y) {}
@@ -101,13 +129,39 @@ void CPlayer::Update(float dt, std::vector<CGameObject*>* coObjects)
 	if (wallJumpTimer > 0)
 		wallJumpTimer -= dt;
 
-	CheckWalls(coObjects);
+	if (dashBufferTimer > 0)
+		dashBufferTimer -= dt;
+	if (dashCooldownTimer > 0)
+		dashCooldownTimer -= dt;
+	if (dashTimer > 0)
+		dashTimer -= dt;
+
+
+	CheckSensors(coObjects);
 	HandleInput();
 
 	CGame* game = CGame::GetInstance();
 
-	vy += PLAYER_GRAVITY * dt;
-	if (state == PLAYER_STATE_WALL_SLIDE) 
+	if (state == PLAYER_STATE_DASH)
+	{
+		vx = dashDir * PLAYER_DASH_SPEED;
+		vy = 0;
+	}
+	else
+	{
+		vy += PLAYER_GRAVITY * dt;
+		if (state == PLAYER_STATE_WALL_SLIDE)
+		{
+			if (vy > PLAYER_WALL_SLIDE_SPEED)
+				vy = PLAYER_WALL_SLIDE_SPEED;
+		}
+		else
+			if (vy > PLAYER_MAX_FALL_SPEED)
+				vy = PLAYER_MAX_FALL_SPEED;
+	}
+
+
+	if (state == PLAYER_STATE_WALL_SLIDE)
 	{
 		if (vy > PLAYER_WALL_SLIDE_SPEED)
 			vy = PLAYER_WALL_SLIDE_SPEED;
@@ -116,17 +170,6 @@ void CPlayer::Update(float dt, std::vector<CGameObject*>* coObjects)
 		if (vy > PLAYER_MAX_FALL_SPEED)
 			vy = PLAYER_MAX_FALL_SPEED;
 
-
-	if (state == PLAYER_STATE_WALL_SLIDE) 
-	{
-		if (vy > PLAYER_WALL_SLIDE_SPEED)
-			vy = PLAYER_WALL_SLIDE_SPEED;
-	}
-	else
-		if (vy > PLAYER_MAX_FALL_SPEED)
-			vy = PLAYER_MAX_FALL_SPEED;
-
-	isOnGround = false;
 	CCollision::Process(this, dt, coObjects);
 
 	if (y > game->GetBackBufferHeight() + 50)
@@ -176,6 +219,19 @@ void CPlayer::SetState(int newState)
 		nx = -wallDir;
 		animator.Play(ID_ANI_PLAYER_JUMP, true);
 		break;
+	case PLAYER_STATE_DASH:
+		dashTimer = PLAYER_DASH_TIME;
+		dashCooldownTimer = PLAYER_DASH_COOLDOWN;
+		if (!isOnGround)
+			airDashChargeLeft--;
+		nx = dashDir;
+		vx = dashDir * PLAYER_DASH_SPEED;
+		vy = 0;
+		coyoteTimer = 0;
+		wallCoyoteTimer = 0;
+		wallJumpTimer = 0;
+		animator.Play(ID_ANI_PLAYER_DASH, true);
+		break;
 	default:
 		animator.Play(ID_ANI_PLAYER_IDLE, false);
 		break;
@@ -198,7 +254,6 @@ void CPlayer::OnCollisionWith(CCollisionEvent* e)
 	if (e->ny < 0)
 	{
 		vy = 0;
-		isOnGround = true;
 	}
 
 	if (e->ny > 0)
@@ -208,14 +263,14 @@ void CPlayer::OnCollisionWith(CCollisionEvent* e)
 		vx = 0;
 }
 
-void CPlayer::CheckWalls(std::vector<CGameObject*>* coObjects)
+void CPlayer::CheckSensors(std::vector<CGameObject*>* coObjects)
 {
 	float pl, pt, pr, pb;
 	GetBoundingBox(pl, pt, pr, pb);
 
-	pt += 2;
-	pb -= 2;
-	bool overlapLeft = false, overlapRight = false;
+	float st = pt + 2;
+	float sb = pb - 2;
+	bool overlapLeft = false, overlapRight = false, ground = false;
 	for (CGameObject* obj : *coObjects)
 	{
 		if (obj == this || obj->IsDeleted() || !obj->IsBlock())
@@ -224,10 +279,12 @@ void CPlayer::CheckWalls(std::vector<CGameObject*>* coObjects)
 		float wl, wt, wr, wb;
 		obj->GetBoundingBox(wl, wt, wr, wb);
 
-		if (CCollision::Overlap(pr, pt, pr + PLAYER_SENSOR_SKIN, pb, wl, wt, wr, wb))
+		if (CCollision::Overlap(pr, st, pr + PLAYER_SENSOR_SKIN, sb, wl, wt, wr, wb))
 			overlapRight = true;
-		if (CCollision::Overlap(pl - PLAYER_SENSOR_SKIN, pt, pl, pb, wl, wt, wr, wb))
+		if (CCollision::Overlap(pl - PLAYER_SENSOR_SKIN, st, pl, sb, wl, wt, wr, wb))
 			overlapLeft = true;
+		if (CCollision::Overlap(pl + 1, pb, pr - 1, pb + PLAYER_SENSOR_SKIN, wl, wt, wr, wb))
+			ground = true;
 	}
 
 	if (overlapRight)
@@ -242,4 +299,6 @@ void CPlayer::CheckWalls(std::vector<CGameObject*>* coObjects)
 	}
 	else
 		isTouchingWall = false;
+
+	isOnGround = ground;
 }
