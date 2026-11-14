@@ -14,26 +14,43 @@ void CPlayer::HandleInput()
 		jumpBufferTimer = PLAYER_JUMP_BUFFER_TIME;
 	if (isOnGround)
 		coyoteTimer = PLAYER_COYOTE_TIME;
+	if (!isOnGround && isTouchingWall)
+		wallCoyoteTimer = PLAYER_WALL_COYOTE_TIME;
 
 	int moveDirection = 0;
 	if (input->IsHeld(VK_RIGHT) || input->IsHeld('D'))
 		moveDirection += 1;
 	if (input->IsHeld(VK_LEFT) || input->IsHeld('A'))
 		moveDirection -= 1;
-	if (moveDirection != 0)
-		nx = moveDirection;
 
 	if (state == PLAYER_STATE_ATTACK)
 		return;
-	vx = moveDirection * PLAYER_RUN_SPEED;
+
+	if (state != PLAYER_STATE_WALL_JUMP || wallJumpTimer <= 0)
+	{
+		if (moveDirection != 0)
+			nx = moveDirection;
+		vx = moveDirection * PLAYER_RUN_SPEED;
+	}
 
 	if (jumpBufferTimer > 0 && coyoteTimer > 0)
 	{
+		coyoteTimer = 0;
+		jumpBufferTimer = 0;
 		SetState(PLAYER_STATE_JUMP);
 		if (!input->IsHeld('Z'))
 			vy *= PLAYER_JUMP_CUT;
-		coyoteTimer = 0;
+		return;
+	}
+
+	if (jumpBufferTimer > 0 && wallCoyoteTimer > 0 && !isOnGround)
+	{
 		jumpBufferTimer = 0;
+		wallCoyoteTimer = 0;
+		wallJumpTimer = PLAYER_WALL_JUMP_LOCK;
+		SetState(PLAYER_STATE_WALL_JUMP);
+		if (!input->IsHeld('Z'))
+			vy *= PLAYER_JUMP_CUT;
 		return;
 	}
 
@@ -41,6 +58,14 @@ void CPlayer::HandleInput()
 	{
 		if (input->IsReleased('Z') && vy < 0)
 			vy *= PLAYER_JUMP_CUT;
+		if (state == PLAYER_STATE_WALL_JUMP && vy < 0)
+			return;
+		if (vy >= 0 && isTouchingWall && moveDirection != -wallDir) 
+		{
+			SetState(PLAYER_STATE_WALL_SLIDE);
+			return;
+		}
+
 		if (vy < 0)
 			SetState(PLAYER_STATE_JUMP);
 		else
@@ -71,15 +96,26 @@ void CPlayer::Update(float dt, std::vector<CGameObject*>* coObjects)
 		jumpBufferTimer -= dt;
 	if (coyoteTimer > 0)
 		coyoteTimer -= dt;
+	if (wallCoyoteTimer > 0)
+		wallCoyoteTimer -= dt;
+	if (wallJumpTimer > 0)
+		wallJumpTimer -= dt;
 
+	CheckWalls(coObjects);
 	HandleInput();
-	
+
 	CGame* game = CGame::GetInstance();
 
 	vy += PLAYER_GRAVITY * dt;
+	if (isTouchingWall) 
+	{
+		if (vy > PLAYER_WALL_SLIDE_SPEED)
+			vy = PLAYER_WALL_SLIDE_SPEED;
+	}
+	else
+		if (vy > PLAYER_MAX_FALL_SPEED)
+			vy = PLAYER_MAX_FALL_SPEED;
 
-	if (vy > PLAYER_MAX_FALL_SPEED)
-		vy = PLAYER_MAX_FALL_SPEED;
 
 	if (state == PLAYER_STATE_WALL_SLIDE) 
 	{
@@ -93,10 +129,7 @@ void CPlayer::Update(float dt, std::vector<CGameObject*>* coObjects)
 	isOnGround = false;
 	CCollision::Process(this, dt, coObjects);
 
-	//float l, t, r, b;
-	//GetBoundingBox(l, t, r, b);
-
-	if (y > game->GetBackBufferHeight() + 50) 
+	if (y > game->GetBackBufferHeight() + 50)
 	{
 		SetPosition(160, 40);
 		vy = 0;
@@ -115,7 +148,7 @@ void CPlayer::Render()
 
 void CPlayer::SetState(int newState)
 {
-	if (newState == state)
+	if (newState == state && newState != PLAYER_STATE_WALL_JUMP)
 		return;
 
 	switch (newState)
@@ -134,6 +167,15 @@ void CPlayer::SetState(int newState)
 	case PLAYER_STATE_FALL:
 		animator.Play(ID_ANI_PLAYER_FALL, false);
 		break;
+	case PLAYER_STATE_WALL_SLIDE:
+		animator.Play(ID_ANI_PLAYER_FALL, false);
+		break;
+	case PLAYER_STATE_WALL_JUMP:
+		vy = -PLAYER_JUMP_SPEED;
+		vx = -wallDir * PLAYER_WALL_JUMP_SPEED;
+		nx = -wallDir;
+		animator.Play(ID_ANI_PLAYER_JUMP, true);
+		break;
 	default:
 		animator.Play(ID_ANI_PLAYER_IDLE, false);
 		break;
@@ -146,7 +188,7 @@ void CPlayer::GetBoundingBox(float& l, float& t, float& r, float& b)
 {
 	l = x - PLAYER_BBOX_WIDTH / 2;
 	r = x + PLAYER_BBOX_WIDTH / 2;
-	
+
 	b = y + PLAYER_FEET_OFFSET;
 	t = b - PLAYER_BBOX_HEIGHT;
 }
@@ -164,4 +206,40 @@ void CPlayer::OnCollisionWith(CCollisionEvent* e)
 
 	if (e->nx != 0)
 		vx = 0;
+}
+
+void CPlayer::CheckWalls(std::vector<CGameObject*>* coObjects)
+{
+	float pl, pt, pr, pb;
+	GetBoundingBox(pl, pt, pr, pb);
+
+	pt += 2;
+	pb -= 2;
+	bool overlapLeft = false, overlapRight = false;
+	for (CGameObject* obj : *coObjects)
+	{
+		if (obj == this || obj->IsDeleted() || !obj->IsBlock())
+			continue;
+
+		float wl, wt, wr, wb;
+		obj->GetBoundingBox(wl, wt, wr, wb);
+
+		if (CCollision::Overlap(pr, pt, pr + PLAYER_SENSOR_SKIN, pb, wl, wt, wr, wb))
+			overlapRight = true;
+		if (CCollision::Overlap(pl - PLAYER_SENSOR_SKIN, pt, pl, pb, wl, wt, wr, wb))
+			overlapLeft = true;
+	}
+
+	if (overlapRight)
+	{
+		isTouchingWall = true;
+		wallDir = 1;
+	}
+	else if (overlapLeft)
+	{
+		isTouchingWall = true;
+		wallDir = -1;
+	}
+	else
+		isTouchingWall = false;
 }
