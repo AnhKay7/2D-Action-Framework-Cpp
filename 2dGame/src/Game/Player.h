@@ -26,7 +26,7 @@
 #define PLAYER_JUMP_BUFFER_TIME  150.0f
 
 #define PLAYER_SENSOR_SKIN        1.0f     
-#define PLAYER_WALL_SLIDE_SPEED   0.05      
+#define PLAYER_WALL_SLIDE_SPEED   0.053f 
 #define PLAYER_WALL_COYOTE_TIME   80.0f    
 #define PLAYER_WALL_JUMP_SPEED    0.128f   
 #define PLAYER_WALL_JUMP_LOCK     150.0f
