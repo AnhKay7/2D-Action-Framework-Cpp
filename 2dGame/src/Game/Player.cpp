@@ -117,6 +117,15 @@ void CPlayer::Update(float dt, std::vector<CGameObject*>* coObjects)
 			vy = PLAYER_MAX_FALL_SPEED;
 
 
+	if (state == PLAYER_STATE_WALL_SLIDE) 
+	{
+		if (vy > PLAYER_WALL_SLIDE_SPEED)
+			vy = PLAYER_WALL_SLIDE_SPEED;
+	}
+	else
+		if (vy > PLAYER_MAX_FALL_SPEED)
+			vy = PLAYER_MAX_FALL_SPEED;
+
 	isOnGround = false;
 	CCollision::Process(this, dt, coObjects);
 
@@ -134,7 +143,7 @@ void CPlayer::Update(float dt, std::vector<CGameObject*>* coObjects)
 
 void CPlayer::Render()
 {
-	animator.Render(x, y, nx < 0);
+	animator.Render(x, y, state == PLAYER_STATE_WALL_SLIDE ? wallDir > 0 : nx < 0);
 }
 
 void CPlayer::SetState(int newState)
