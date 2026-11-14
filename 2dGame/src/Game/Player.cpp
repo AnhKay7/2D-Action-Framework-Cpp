@@ -107,7 +107,7 @@ void CPlayer::Update(float dt, std::vector<CGameObject*>* coObjects)
 	CGame* game = CGame::GetInstance();
 
 	vy += PLAYER_GRAVITY * dt;
-	if (isTouchingWall) 
+	if (state == PLAYER_STATE_WALL_SLIDE) 
 	{
 		if (vy > PLAYER_WALL_SLIDE_SPEED)
 			vy = PLAYER_WALL_SLIDE_SPEED;
@@ -134,7 +134,7 @@ void CPlayer::Update(float dt, std::vector<CGameObject*>* coObjects)
 
 void CPlayer::Render()
 {
-	animator.Render(x, y, nx < 0);
+	animator.Render(x, y, state == PLAYER_STATE_WALL_SLIDE ? wallDir > 0 : nx < 0);
 }
 
 void CPlayer::SetState(int newState)
