@@ -36,12 +36,14 @@ void CPlayScene::LoadAssets()
 	texs->Add(ID_TEX_PLAYER_ATTACK1, TEX_PATH_PLAYER_ATTACK1);
 	texs->Add(ID_TEX_PLAYER_JUMP, TEX_PATH_PLAYER_JUMP);
 	texs->Add(ID_TEX_PLAYER_FALL, TEX_PATH_PLAYER_FALL);
+	texs->Add(ID_TEX_PLAYER_DASH, TEX_PATH_PLAYER_DASH);
 
 	AddStrip(ID_TEX_PLAYER_IDLE, ID_SPRITE_PLAYER_IDLE, 7, ID_ANI_PLAYER_IDLE, 100, true);
 	AddStrip(ID_TEX_PLAYER_RUN, ID_SPRITE_PLAYER_RUN, 8, ID_ANI_PLAYER_RUN, 80, true);
 	AddStrip(ID_TEX_PLAYER_ATTACK1, ID_SPRITE_PLAYER_ATTACK1, 10, ID_ANI_PLAYER_ATTACK1, 60, false);
 	AddStrip(ID_TEX_PLAYER_JUMP, ID_SPRITE_PLAYER_JUMP, 4, ID_ANI_PLAYER_JUMP, 80, false);
 	AddStrip(ID_TEX_PLAYER_FALL, ID_SPRITE_PLAYER_FALL, 4, ID_ANI_PLAYER_FALL, 80, true);
+	AddStrip(ID_TEX_PLAYER_DASH, ID_SPRITE_PLAYER_DASH, 12, ID_ANI_PLAYER_DASH, 17, false);
 
 
 	texs->Add(ID_TEX_BRICK, TEX_PATH_BRICK);
@@ -84,7 +86,7 @@ void CPlayScene::Load()
 
 	for (int i = 0; (16 * i + 8) < MAP_RIGHT; i++)
 	{
-		if (i >= 30 && i <= 32)
+		if (i >= 27 && i <= 32)
 			continue;
 		objects.push_back(new CBrick(16 * i + 8, 128 + 8));
 	}
