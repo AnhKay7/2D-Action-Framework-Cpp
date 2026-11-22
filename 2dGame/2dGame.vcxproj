@@ -179,6 +179,7 @@
     <ClInclude Include="src\Engine\Debug.h" />
     <ClInclude Include="src\Engine\Texture.h" />
     <ClInclude Include="src\Engine\Textures.h" />
+    <ClInclude Include="src\Game\PlayerStats.h" />
     <ClInclude Include="src\Game\PlayScene.h" />
   </ItemGroup>
   <ItemGroup>

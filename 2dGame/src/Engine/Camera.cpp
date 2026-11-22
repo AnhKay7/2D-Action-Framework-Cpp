@@ -60,7 +60,7 @@ void CCamera::Update(float dt)
 	if (sy > CAM_DZ_BOTTOM)
 		y = ty - CAM_DZ_BOTTOM;
 	
-	x += (desiredX - x) * min(1.0f,CAM_SMOOTH) * dt;
+	x += (desiredX - x) * min(1.0f, CAM_SMOOTH * dt);
 
 	ClampToBounds();
 	Apply();

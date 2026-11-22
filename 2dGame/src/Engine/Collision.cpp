@@ -46,7 +46,6 @@ void CCollision::SweptAABB(
 
 void CCollision::Process(CGameObject* src, float dt, std::vector<CGameObject*>* coObjects)
 {
-    //float ml, mt, mr, mb;
     float x, y;
     src->GetPosition(x, y);
     float vx, vy;

@@ -8,7 +8,6 @@
 
 #include "Game/PlayScene.h"
 
-
 #pragma comment(lib, "winmm.lib")
 
 #define WINDOW_CLASS_NAME	L"2GameWindow"
@@ -88,9 +87,9 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 	bool running = true;
 
 	LARGE_INTEGER freq, prev, now;
-	QueryPerformanceFrequency(&freq);  // đồng hồ chính xác cỡ micro giây
+	QueryPerformanceFrequency(&freq);  
 	QueryPerformanceCounter(&prev);
-	const double STEP_MS = 1000.0 / UPDATES_PER_SECOND;   // 16.67 ms thật
+	const double STEP_MS = 1000.0 / UPDATES_PER_SECOND;   
 	double accumulator = 0;
 
 
@@ -108,7 +107,7 @@ int WINAPI WinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPSTR lpCmdLine
 		QueryPerformanceCounter(&now);
 		double elapsed = (now.QuadPart - prev.QuadPart) * 1000.0 / freq.QuadPart;
 		prev = now;
-		if (elapsed > 250) elapsed = 250;   // kéo cửa sổ / dừng debugger: đừng chạy bù cả trăm lần
+		if (elapsed > 250) elapsed = 250;   
 
 		accumulator += elapsed;
 		while (accumulator >= STEP_MS)
