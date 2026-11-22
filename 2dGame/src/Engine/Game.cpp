@@ -77,7 +77,7 @@ bool CGame::Init(HWND hWnd, int bbWidth, int bbHeight)
 	D3DXMatrixOrthoOffCenterLH(&matProjection,
 		0.0f, (float)bbWidth,     // trái, phải
 		0.0f, (float)bbHeight,    // dưới, trên
-		0.1f, 10.0f);             // gần, xa (game 2D không quan tâm lắm)
+		0.1f, 10.0f);             
 	spriteObject->SetProjectionTransform(&matProjection);
 
 	D3D10_BLEND_DESC bd = {};
@@ -112,10 +112,10 @@ void CGame::BeginRender(float r, float g, float b)
 
 	device->ClearRenderTargetView(renderTargetView, color);
 
-	spriteObject->Begin(D3DX10_SPRITE_SORT_TEXTURE);    // cầm cọ lên
+	spriteObject->Begin(D3DX10_SPRITE_SORT_TEXTURE);    
 
 	float blendFactor[4] = { 0, 0, 0, 0 };
-	device->OMSetBlendState(blendStateAlpha, blendFactor, 0xffffffff);  // bật giấy bóng kính
+	device->OMSetBlendState(blendStateAlpha, blendFactor, 0xffffffff);  
 	device->PSSetSamplers(0, 1, &pointSampler);
 }
 
