@@ -8,7 +8,6 @@
 
 #include "Game/PlayScene.h"
 
-
 #pragma comment(lib, "winmm.lib")
 
 #define WINDOW_CLASS_NAME	L"2GameWindow"
