@@ -145,6 +145,7 @@
   <ItemGroup>
     <ClCompile Include="src\Engine\Camera.cpp" />
     <ClCompile Include="src\Engine\Collision.cpp" />
+    <ClCompile Include="src\Engine\TileMap.cpp" />
     <ClCompile Include="src\Game\Brick.cpp" />
     <ClCompile Include="src\Game\Player.cpp" />
     <ClCompile Include="src\Engine\GameObject.cpp" />
@@ -165,8 +166,10 @@
     <ClInclude Include="src\Engine\Camera.h" />
     <ClInclude Include="src\Engine\Collision.h" />
     <ClInclude Include="src\Engine\Scene.h" />
+    <ClInclude Include="src\Engine\TileMap.h" />
     <ClInclude Include="src\Game\Brick.h" />
     <ClInclude Include="src\Game\AssetIDs.h" />
+    <ClInclude Include="src\Game\Collider.h" />
     <ClInclude Include="src\Game\Player.h" />
     <ClInclude Include="src\Engine\GameObject.h" />
     <ClInclude Include="src\Engine\Input.h" />
@@ -181,6 +184,7 @@
     <ClInclude Include="src\Engine\Textures.h" />
     <ClInclude Include="src\Game\PlayerStats.h" />
     <ClInclude Include="src\Game\PlayScene.h" />
+    <ClInclude Include="src\ThirdParty\nlohmann\json.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

@@ -37,6 +37,9 @@ private:
     float coyoteTimer = 0;
     float jumpBufferTimer = 0;
 
+    float spawnX = 0, spawnY = 0;
+    float fallLimitY = 100000.0f;
+
     void ReadInput();
     void CheckSensors(std::vector<CGameObject*>* coObjects);
     void UpdateHorizontal(float dt);
@@ -47,7 +50,7 @@ private:
     float JumpSpeedForCurrentRun();
 
 public:
-    CPlayer(float x, float y) : CGameObject(x, y) { SetState(PLAYER_STATE_IDLE); }
+    CPlayer(float x, float y) : CGameObject(x, y), spawnX(x), spawnY(y) { SetState(PLAYER_STATE_IDLE); }
 
     void Update(float dt, std::vector<CGameObject*>* coObjects) override;
     void Render() override;
@@ -60,4 +63,6 @@ public:
     float GetMeter() { return meter; }
     float GetVx() { return vx; }
     float GetVy() { return vy; }
+
+    void SetFallLimit(float y) { fallLimitY = y; }
 };

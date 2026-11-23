@@ -9,6 +9,7 @@
 #include "Game/AssetIDs.h"
 #include "Game/Player.h"
 #include "Game/Brick.h"
+#include "Game/Collider.h"
 
 #include <algorithm>
 

@@ -4,6 +4,7 @@
 #define ID_TEX_PLAYER_SMALL         10
 
 #define ID_TEX_BRICK                50
+#define ID_TEX_TILESET				60
 #define ID_TEX_BBOX                 90
 
 // ===== Sprite ===== 
@@ -23,3 +24,5 @@
 #define TEX_PATH_PLAYER_SMALL   L"assets\\test\\player_small_placeholder.png"
 #define TEX_PATH_BRICK          L"assets\\tiles\\brick.png"
 #define TEX_PATH_BBOX           L"assets\\debug\\bbox.png"
+// Đường dẫn map là chuỗi thường (không có L) vì đọc bằng std::ifstream
+#define MAP_PATH_LEVEL1     "assets\\tiles\\map-1.1.tmj"

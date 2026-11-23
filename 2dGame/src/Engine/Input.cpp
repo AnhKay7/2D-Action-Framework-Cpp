@@ -20,8 +20,6 @@ void CInput::Update()
             current[k] = false;
         return;
     }
-    //current[k] = (GetAsyncKeyState(k) & 0x8000) != 0;
-    //(bit 0x8000 = "đang bị đè")
     for (int k = 0; k < 256; k++)
         current[k] = (GetAsyncKeyState(k) & 0x8000) != 0;
 }
