@@ -187,6 +187,7 @@
     <ClInclude Include="src\ThirdParty\nlohmann\json.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="assets\tiles\map-1.1.tmj" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
