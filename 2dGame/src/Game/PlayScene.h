@@ -3,16 +3,13 @@
 #include "Engine/Scene.h"
 #include "Engine/GameObject.h"
 #include "Engine/Camera.h"
-
-#define MAP_LEFT     0
-#define MAP_RIGHT    1600
-#define MAP_TOP     -240     // trời phía trên màn hình đầu, để leo bục
-#define MAP_BOTTOM   240
+#include "Engine/TileMap.h"
 
 class CPlayer;
 
 class CPlayScene : public CScene
 {
+private:
     std::vector<CGameObject*> objects;
     CPlayer* player = nullptr;
     bool showBBox = false;
@@ -21,6 +18,11 @@ class CPlayScene : public CScene
     void PurgeDeletedObjects();        
     
     CCamera camera;
+
+    CTileMap map;
+
+    void BuildColliders(const TileLayer* layer, bool semiSolid);
+    void SpawnObjects();
 public:
     void Load() override;
     void Update(float dt) override;

@@ -37,4 +37,6 @@ public:
     void GetPosition(float& x, float& y) { x = this->x; y = this->y; }   
     void SetPosition(float x, float y) { this->x = x; this->y = y; }     
     void GetSpeed(float& vx, float& vy) { vx = this->vx; vy = this->vy; } 
+
+    virtual bool IsSemiSolid() { return false; }
 };

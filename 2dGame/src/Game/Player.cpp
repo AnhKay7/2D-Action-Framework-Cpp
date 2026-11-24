@@ -3,8 +3,7 @@
 #include "Engine/Game.h"
 #include "Engine/Input.h"
 #include "Engine/Collision.h"
-#include "Game/AssetIDs.h"
-#include "Game/PlayScene.h"     
+#include "Game/AssetIDs.h"    
 
 using namespace PlayerStats;
 
@@ -46,9 +45,9 @@ void CPlayer::Update(float dt, std::vector<CGameObject*>* coObjects)
 	UpdateMeter(dt);
 	UpdateState();
 
-	if (y > MAP_BOTTOM + 32)
+	if (y > fallLimitY)
 	{
-		SetPosition(PLAYER_START_X, PLAYER_START_Y);
+		SetPosition(spawnX, spawnY);
 		vx = vy = 0;
 		meter = 0;
 	}
@@ -105,6 +104,13 @@ void CPlayer::CheckSensors(std::vector<CGameObject*>* coObjects)
 			continue;
 		float ol, ot, orr, ob;
 		obj->GetBoundingBox(ol, ot, orr, ob);
+		if (obj->IsSemiSolid())
+		{
+			if (vy >= 0 && pb <= ot + 0.5f &&
+				CCollision::Overlap(pl + 1, pb, pr - 1, pb + SENSOR_SKIN, ol, ot, orr, ob))
+				ground = true;
+			continue;
+		}
 		if (CCollision::Overlap(pl + 1, pb, pr - 1, pb + SENSOR_SKIN, ol, ot, orr, ob))
 			ground = true;
 	}

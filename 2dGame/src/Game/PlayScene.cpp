@@ -9,6 +9,7 @@
 #include "Game/AssetIDs.h"
 #include "Game/Player.h"
 #include "Game/Brick.h"
+#include "Game/Collider.h"
 
 #include <algorithm>
 
@@ -71,37 +72,26 @@ void CPlayScene::Load()
 {
 	LoadAssets();
 
+	if (!map.Load(MAP_PATH_LEVEL1, ID_TEX_TILESET))
+		DebugOut(L"[ERROR] Khong nap duoc map, xem cac dong [MAP] o tren\n");
+
+	BuildColliders(map.FindLayer("Solid"), false);
+	BuildColliders(map.FindLayer("SemiSolid"), true);
+	SpawnObjects();
+
+	if (player == nullptr)          // map chưa có object Player
+	{
+		DebugOut(L"[MAP] Khong co object Player, dung vi tri mac dinh\n");
+		player = new CPlayer(PLAYER_START_X, PLAYER_START_Y);
+		objects.push_back(player);
+	}
+	player->SetFallLimit(map.GetHeightPx() + 32.0f);
+
 	CGame* game = CGame::GetInstance();
-	float bbWidth = game->GetBackBufferWidth();
-	float bbHeight = game->GetBackBufferHeight();
-
-	player = new CPlayer(PLAYER_START_X, PLAYER_START_Y);
-	objects.push_back(player);
-
-	for (int i = 0; i < 100; i++)
-	{
-		bool hole = (i >= 20 && i <= 22)      
-			|| (i >= 40 && i <= 46)      
-			|| (i >= 70 && i <= 79);     
-		if (hole)
-			continue;
-		objects.push_back(new CBrick(16 * i + 8, 136));
-	}
-
-	for (int i = 8; i <= 12; i++)
-		objects.push_back(new CBrick(16 * i + 8, 72));
-
-	for (int i = 0; i < 6; i++)
-	{
-		objects.push_back(new CBrick(MAP_LEFT + 8, 120 - 16 * i));
-		objects.push_back(new CBrick(MAP_RIGHT - 8, 120 - 16 * i));
-	}
-
-	camera.SetViewSize(bbWidth, bbHeight);
-	camera.SetBounds(MAP_LEFT, MAP_TOP, MAP_RIGHT, MAP_BOTTOM);
+	camera.SetViewSize(game->GetBackBufferWidth(), game->GetBackBufferHeight());
+	camera.SetBounds(0, 0, map.GetWidthPx(), map.GetHeightPx());
 	camera.Follow(player);
 	camera.SnapToTarget();
-	//game->SetCamPos(40, 0);
 }
 
 void CPlayScene::Update(float dt)
@@ -127,6 +117,7 @@ void CPlayScene::Update(float dt)
 
 void CPlayScene::Render()
 {
+	map.Render();
 	for (CGameObject* obj : objects)
 	{
 		obj->Render();
@@ -145,3 +136,64 @@ void CPlayScene::Unload()
 	player = nullptr;
 	camera.Follow(nullptr);
 }
+
+#define MAX_MERGE_TILES 16
+void CPlayScene::BuildColliders(const TileLayer* layer, bool semiSolid)
+{
+	if (layer == nullptr)
+		return;
+
+	int tileW = map.GetTileW();
+	int tileH = map.GetTileH();
+	int newColliderCount = 0;
+	for (int row = 0; row < map.GetHeight(); row++)
+	{
+		int start = -1;
+		for (int col = 0; col <= map.GetWidth(); col++)
+		{
+			bool filled = map.GetTile(layer, col, row) != 0;
+			bool full = (start != -1 && col - start >= MAX_MERGE_TILES);
+
+			if (start != -1 && (!filled || full))
+			{
+				objects.push_back(new CCollider(start * tileW, row * tileH, (col - start) * tileW, tileH, semiSolid));
+				newColliderCount++;
+				start = -1;
+			}
+
+			if (filled && start == -1)
+				start = col;
+		}
+	}
+	DebugOut(L"BuildColliders [%S]: Them %d collider vao objects\n", layer->name.c_str(), newColliderCount);
+}
+void CPlayScene::SpawnObjects()
+{
+	for (const MapObject& o : map.GetObjects())
+	{
+		float cx = o.x + o.width / 2;     
+		float cy = o.y + o.height / 2;   
+		float bottom = o.y + o.height;        
+
+		if (o.type == "Player")
+		{
+			if (player != nullptr)
+			{
+				DebugOut(L"Warning: Ton tai hai class player trong scene -> 'khong tao player thu hai'");
+				continue;
+			}
+			player = new CPlayer(cx, bottom - PlayerStats::FEET_OFFSET);
+			objects.push_back(player);
+			continue;
+		}
+
+		if (o.type == "BlockCoin" || o.type == "BlockPower" || o.type == "BtnBrick")
+		{
+			objects.push_back(new CBrick(cx, cy));
+			continue;
+		}
+		
+		DebugOut(L"[MAP] Chua ho tro Class '%S'\n", o.type.c_str());
+	}
+}
+
