@@ -187,7 +187,7 @@ void CPlayScene::SpawnObjects()
 			continue;
 		}
 
-		if (o.type == "QuestionBlock" || o.type == "Brick" )
+		if (o.type == "BlockCoin" || o.type == "BlockPower" || o.type == "BtnBrick")
 		{
 			objects.push_back(new CBrick(cx, cy));
 			continue;
