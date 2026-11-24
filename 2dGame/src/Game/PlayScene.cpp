@@ -175,14 +175,25 @@ void CPlayScene::SpawnObjects()
 		float cy = o.y + o.height / 2;   
 		float bottom = o.y + o.height;        
 
-		if (o.type == "Player" && player == nullptr)
+		if (o.type == "Player")
 		{
-			player = new CPlayer(cx, cy - PlayerStats::FEET_OFFSET);
+			if (player != nullptr)
+			{
+				DebugOut(L"Warning: Ton tai hai class player trong scene -> 'khong tao player thu hai'");
+				continue;
+			}
+			player = new CPlayer(cx, bottom - PlayerStats::FEET_OFFSET);
 			objects.push_back(player);
+			continue;
 		}
 
-		//if (o.type == "QuestionBlock" || o.type == "Brick")
-			
+		if (o.type == "QuestionBlock" || o.type == "Brick" )
+		{
+			objects.push_back(new CBrick(cx, cy));
+			continue;
+		}
+		
+		DebugOut(L"[MAP] Chua ho tro Class '%S'\n", o.type.c_str());
 	}
 }
 

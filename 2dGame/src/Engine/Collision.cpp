@@ -94,6 +94,9 @@ bool CCollision::FindFirstHit(CGameObject* src, float dx, float dy, std::vector<
     {
         if (obj == src || obj->IsDeleted() || !obj->IsBlock())
             continue;
+        bool movingDown = (dx == 0 && dy > 0);
+        if (obj->IsSemiSolid() && !movingDown)
+            continue;
 
         float sl, st, sr, sb;
         obj->GetBoundingBox(sl, st, sr, sb);
