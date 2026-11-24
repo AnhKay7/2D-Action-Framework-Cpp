@@ -41,6 +41,7 @@ void CPlayer::Update(float dt, std::vector<CGameObject*>* coObjects)
 	UpdateVertical(dt);
 
 	CCollision::Process(this, dt, coObjects);
+	CheckTouches(coObjects);
 
 	UpdateMeter(dt);
 	UpdateState();
@@ -88,8 +89,10 @@ void CPlayer::GetBoundingBox(float& l, float& t, float& r, float& b)
 
 void CPlayer::OnCollisionWith(CCollisionEvent* e)
 {
-	if (e->ny != 0) vy = 0;     // chạm sàn hoặc cụng trần
-	if (e->nx != 0) vx = 0;     // đâm tường
+	if (e->ny != 0) vy = 0;  
+	if (e->ny > 0)
+		e->obj->OnHitFromBelow(this);
+	if (e->nx != 0) vx = 0;
 }
 
 void CPlayer::CheckSensors(std::vector<CGameObject*>* coObjects)
@@ -242,4 +245,22 @@ float CPlayer::JumpSpeedForCurrentRun()
 	if (fabs(vx) >= JUMP_MID_FROM)
 		return JUMP_SPEED_MID;
 	return JUMP_SPEED_SLOW;
+}
+
+void CPlayer::CheckTouches(std::vector<CGameObject*>* coObjects)
+{
+	for (CGameObject* obj : *coObjects)
+	{
+		if (obj == this || obj->IsDeleted() || obj->IsBlock())
+			continue;
+
+		float pl, pt, pr, pb, l, t, r, b;
+		GetBoundingBox(pl, pt, pr, pb);
+		obj->GetBoundingBox(l, t, r, b);
+		if (CCollision::Overlap(pl, pt, pr, pb, l, t, r, b))
+		{
+			obj->OnPlayerTouch(this);
+		}
+	}
+
 }

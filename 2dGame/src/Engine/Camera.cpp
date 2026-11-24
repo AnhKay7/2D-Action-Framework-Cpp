@@ -2,9 +2,9 @@
 #include "GameObject.h"
 #include "Game.h"
 
-#define CAM_DZ_LEFT    140     // target lọt ra ngoài [140, 180] theo ngang thì camera mới chạy
+#define CAM_DZ_LEFT    140
 #define CAM_DZ_RIGHT   180
-#define CAM_DZ_TOP      80     // ngoài [80, 160] theo dọc thì camera mới chạy
+#define CAM_DZ_TOP      80     
 #define CAM_DZ_BOTTOM  160
 
 #define CAM_SMOOTH 0.01

@@ -33,6 +33,8 @@ public:
     int   GetState() { return state; }
 
     virtual void OnCollisionWith(CCollisionEvent* e) {}
+    virtual void OnHitFromBelow(CGameObject* by) {}
+    virtual void OnPlayerTouch(CGameObject* player) {}
 
     void GetPosition(float& x, float& y) { x = this->x; y = this->y; }   
     void SetPosition(float x, float y) { this->x = x; this->y = y; }     

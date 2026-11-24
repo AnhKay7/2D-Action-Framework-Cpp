@@ -69,6 +69,24 @@
     <ClCompile Include="src\Engine\TileMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\Game\Coin.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\CoinPop.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\GrowItem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\Block.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\BreakableBrick.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Game\QuestionBlock.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Engine\Debug.h">
@@ -137,16 +155,57 @@
     <ClInclude Include="src\Game\Collider.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="src\Game\BrickPiece.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Coin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\CoinPop.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\GrowItem.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\BreakableBrick.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\Block.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Game\QuestionBlock.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
     <None Include="assets\tiles\map-1.1.tmj" />
+    <None Include="assets\tiles\map-1.1.tmx" />
+    <None Include="assets\tiles\map-1.1_fixed.tmx" />
+    <None Include="assets\tiles\Stage_Tiles.tsx" />
+    <None Include="assets\tiles\Stage_Tiles_full_backup.tsx" />
+    <None Include="assets\tiles\world-1-1.tsx" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\debug\bbox.png">
       <Filter>Resource Files</Filter>
     </Image>
     <Image Include="assets\tiles\brick.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\tiles\world-1-1_16px.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\tiles\Stage_Tiles_Plains1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\tiles\tileset_placeholder.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\tiles\world-1-1.png">
+      <Filter>Resource Files</Filter>
+    </Image>
+    <Image Include="assets\tiles\[Example] NES - Super Mario Bros. 3 - Grass Land - Stage 1-1.png">
       <Filter>Resource Files</Filter>
     </Image>
   </ItemGroup>
