@@ -13,7 +13,8 @@ void CCoinPop::Update(float dt, std::vector<CGameObject*>* coObjects)
     // - Cộng trọng lực vào vy, cộng vy*dt vào y (không cần CCollision, xu này xuyên mọi thứ).
     // - Khi đang RƠI (vy > 0) và y đã xuống tới startY - 8 thì Delete().
     vy += COIN_POP_GRAVITY * dt;
-    if (vy > 0 && y > startY - 8)
+    y += vy * dt;
+    if (vy > 0 && y > startY)
         Delete();
     animator.Update(dt);
 }

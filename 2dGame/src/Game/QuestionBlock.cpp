@@ -45,4 +45,6 @@ void CQuestionBlock::SpawnContent(CGameObject* by)
         CGrowItem* obj = new CGrowItem(x, y);
         CPlayScene::current->Spawn(obj, true);
     }
+
+    SetState(QBLOCK_STATE_EMPTY);
 }

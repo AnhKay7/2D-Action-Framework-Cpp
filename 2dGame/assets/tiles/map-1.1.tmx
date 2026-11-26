@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="192" height="40" tilewidth="16" tileheight="16" infinite="0" nextlayerid="10" nextobjectid="76">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="192" height="40" tilewidth="16" tileheight="16" infinite="0" nextlayerid="10" nextobjectid="77">
  <editorsettings>
   <export target="map-1.1.tmj" format="json"/>
  </editorsettings>
@@ -318,24 +318,24 @@
   <object id="73" name="coin" type="Coin" x="1760" y="144" width="16" height="16"/>
   <object id="74" name="coin" type="Coin" x="1808" y="112" width="16" height="16"/>
   <object id="75" name="coin" type="Coin" x="1840" y="144" width="16" height="16"/>
-  <object id="33" type="Brick" x="1984" y="384" width="16" height="16"/>
-  <object id="34" type="Brick" x="2000" y="384" width="16" height="16"/>
-  <object id="35" type="Brick" x="2016" y="384" width="16" height="16"/>
-  <object id="36" type="Brick" x="2016" y="400" width="16" height="16"/>
-  <object id="37" type="Brick" x="2032" y="400" width="16" height="16"/>
+  <object id="33" type="BreakableBrick" x="1984" y="384" width="16" height="16"/>
+  <object id="34" type="BreakableBrick" x="2000" y="384" width="16" height="16"/>
+  <object id="35" type="BreakableBrick" x="2016" y="384" width="16" height="16"/>
+  <object id="36" type="BreakableBrick" x="2016" y="400" width="16" height="16"/>
+  <object id="37" type="BreakableBrick" x="2032" y="400" width="16" height="16"/>
   <object id="48" type="BtnBrick" x="2032" y="384" width="16" height="16"/>
-  <object id="38" type="Brick" x="2000" y="400" width="16" height="16"/>
-  <object id="39" type="Brick" x="1984" y="400" width="16" height="16"/>
-  <object id="40" type="Brick" x="1968" y="400" width="16" height="16"/>
-  <object id="41" type="Brick" x="2048" y="416" width="16" height="16"/>
-  <object id="49" type="Brick" x="2096" y="400" width="16" height="16"/>
-  <object id="50" type="Brick" x="2096" y="416" width="16" height="16"/>
-  <object id="52" type="Brick" x="2112" y="416" width="16" height="16"/>
-  <object id="42" type="Brick" x="2032" y="416" width="16" height="16"/>
-  <object id="43" type="Brick" x="2016" y="416" width="16" height="16"/>
-  <object id="44" type="Brick" x="2000" y="416" width="16" height="16"/>
-  <object id="45" type="Brick" x="1984" y="416" width="16" height="16"/>
-  <object id="46" type="Brick" x="1968" y="416" width="16" height="16"/>
-  <object id="47" type="Brick" x="1952" y="416" width="16" height="16"/>
+  <object id="38" type="BreakableBrick" x="2000" y="400" width="16" height="16"/>
+  <object id="39" type="BreakableBrick" x="1984" y="400" width="16" height="16"/>
+  <object id="40" type="BreakableBrick" x="1968" y="400" width="16" height="16"/>
+  <object id="41" type="BreakableBrick" x="2048" y="416" width="16" height="16"/>
+  <object id="49" type="BreakableBrick" x="2096" y="400" width="16" height="16"/>
+  <object id="50" type="BreakableBrick" x="2096" y="416" width="16" height="16"/>
+  <object id="52" type="BreakableBrick" x="2112" y="416" width="16" height="16"/>
+  <object id="42" type="BreakableBrick" x="2032" y="416" width="16" height="16"/>
+  <object id="43" type="BreakableBrick" x="2016" y="416" width="16" height="16"/>
+  <object id="44" type="BreakableBrick" x="2000" y="416" width="16" height="16"/>
+  <object id="45" type="BreakableBrick" x="1984" y="416" width="16" height="16"/>
+  <object id="46" type="BreakableBrick" x="1968" y="416" width="16" height="16"/>
+  <object id="47" type="BreakableBrick" x="1952" y="416" width="16" height="16"/>
  </objectgroup>
 </map>

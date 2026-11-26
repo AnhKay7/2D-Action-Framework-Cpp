@@ -226,11 +226,17 @@ void CPlayScene::SpawnObjects()
 		{
 			if (player != nullptr)
 			{
-				DebugOut(L"Warning: Ton tai hai class player trong scene -> 'khong tao player thu hai'");
+				DebugOut(L"Warning: Ton tai hai class player trong scene -> 'khong tao player thu hai'\n");
 				continue;
 			}
 			player = new CPlayer(cx, bottom - PlayerStats::FEET_OFFSET);
 			objects.push_back(player);
+			continue;
+		}
+
+		if (o.type == "Coin")
+		{
+			objects.push_back(new CCoin(cx, cy));
 			continue;
 		}
 

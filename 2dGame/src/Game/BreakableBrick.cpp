@@ -11,17 +11,21 @@ CBreakableBrick::CBreakableBrick(float x, float y) : CBlock(x, y)
 
 void CBreakableBrick::OnHitFromBelow(CGameObject* by)
 {
-    // TODO (bạn viết)
-    // CPlayer* p = dynamic_cast<CPlayer*>(by);
-    // - p là player TO: Break()
-    // - ngược lại: StartBump() (chỉ khi chưa đang nảy)
+    CPlayer* p = dynamic_cast<CPlayer*>(by);
+    if (p != nullptr)
+    {
+        if (p->IsBig())
+            Break();
+        else
+            StartBump();
+    }
 }
 
 void CBreakableBrick::Break()
 {
-    // TODO (bạn viết)
-    // - Delete() viên gạch (collider của nó biến mất cuối frame).
-    // - Spawn 4 CBrickPiece ở 4 góc viên gạch (lệch tâm ±4 px),
-    //   2 mảnh bên trái bay sang trái (dir = -1), 2 mảnh bên phải sang phải (dir = 1),
-    //   2 mảnh trên bay cao hơn (high = true).
+    Delete();
+    CPlayScene::current->Spawn(new CBrickPiece(x - 4, y - 4, -1, true), true);
+    CPlayScene::current->Spawn(new CBrickPiece(x + 4, y - 4, 1, true), true);
+    CPlayScene::current->Spawn(new CBrickPiece(x - 4, y + 4, -1, false));
+    CPlayScene::current->Spawn(new CBrickPiece(x + 4, y + 4, 1, false));
 }
