@@ -44,6 +44,10 @@ private:
 
     int coins = 0;
 
+    float invulnTimer = 0;      // > 0: vừa bị thương, nhấp nháy, quái không làm đau
+    int   stompChain = 0;       // số quái đạp liên tiếp chưa chạm đất
+    int   score = 0;            // TẠM: GĐ7 chuyển sang CGameState
+
     void ReadInput();
     void CheckSensors(std::vector<CGameObject*>* coObjects);
     void UpdateHorizontal(float dt);
@@ -83,4 +87,11 @@ public:
             DebugOut(L"[PLAYER] Grow\n");
         }
     }
+
+    int  GetScore() { return score; }
+    bool IsInvulnerable() { return invulnTimer > 0; }
+
+    void OnStompEnemy();        // bạn viết
+    void Hurt();                // TẠM tới bước 19
+    void Respawn();
 };

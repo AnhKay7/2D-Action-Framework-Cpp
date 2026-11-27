@@ -12,6 +12,8 @@
 #include "Game/Coin.h"
 #include "Game/QuestionBlock.h"
 #include "Game/BreakableBrick.h"
+#include "Game/Walker.h"
+#include "Game/ShellEnemy.h"
 
 #include <algorithm>
 
@@ -85,6 +87,21 @@ void CPlayScene::LoadAssets()
 	}
 
 	CSprites::GetInstance()->Add(ID_SPRITE_BRICK, 0, 0, 16, 16, texs->Get(ID_TEX_BRICK));
+
+	// ===== Quái =====
+	texs->Add(ID_TEX_WALKER, TEX_PATH_WALKER);
+	AddStrip(ID_TEX_WALKER, ID_SPRITE_WALKER, 0, 2, 16, 16, ID_ANI_WALKER_WALK, 150, true);
+	AddStrip(ID_TEX_WALKER, ID_SPRITE_WALKER, 2, 1, 16, 16, ID_ANI_WALKER_FLAT, 100, false);
+	AddStrip(ID_TEX_WALKER, ID_SPRITE_WALKER, 3, 1, 16, 16, ID_ANI_WALKER_KNOCK, 100, false);
+
+	texs->Add(ID_TEX_SHELL_WALKER, TEX_PATH_SHELL_WALKER);
+	AddStrip(ID_TEX_SHELL_WALKER, ID_SPRITE_SHELL_WALKER, 0, 2, 16, 28, ID_ANI_SHELLW_WALK, 150, true);
+
+	texs->Add(ID_TEX_SHELL, TEX_PATH_SHELL);
+	AddStrip(ID_TEX_SHELL, ID_SPRITE_SHELL, 0, 1, 16, 16, ID_ANI_SHELL_IDLE, 100, false);
+	AddStrip(ID_TEX_SHELL, ID_SPRITE_SHELL, 0, 2, 16, 16, ID_ANI_SHELL_WAKE, 120, true);   // nằm / ló chân xen kẽ
+	AddStrip(ID_TEX_SHELL, ID_SPRITE_SHELL, 2, 3, 16, 16, ID_ANI_SHELL_SPIN, 50, true);
+	AddStrip(ID_TEX_SHELL, ID_SPRITE_SHELL, 5, 1, 16, 16, ID_ANI_SHELL_KNOCK, 100, false);
 }
 
 void CPlayScene::PurgeDeletedObjects()
@@ -255,6 +272,22 @@ void CPlayScene::SpawnObjects()
 		if (o.type == "BtnBrick" || o.type == "BreakableBrick")
 		{
 			objects.push_back(new CBreakableBrick(cx, cy));
+			continue;
+		}
+
+		if (o.type == "Walker")
+		{
+			CWalker* emy = new CWalker(cx, bottom - 8);
+			objects.push_back(emy);
+			emy->SetTurnAtEdge(o.GetBool("TurnAtEdge"));
+			continue;
+		}
+
+		if (o.type == "ShellEnemy")
+		{
+			CShellEnemy* emy = new CShellEnemy(cx, bottom - 8);
+			objects.push_back(emy);
+			emy->SetTurnAtEdge(o.GetBool("TurnAtEdge"));
 			continue;
 		}
 		DebugOut(L"[MAP] Chua ho tro Class '%S'\n", o.type.c_str());

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="192" height="40" tilewidth="16" tileheight="16" infinite="0" nextlayerid="10" nextobjectid="77">
+<map version="1.10" tiledversion="1.12.2" orientation="orthogonal" renderorder="right-down" width="192" height="40" tilewidth="16" tileheight="16" infinite="0" nextlayerid="10" nextobjectid="84">
  <editorsettings>
   <export target="map-1.1.tmj" format="json"/>
  </editorsettings>
@@ -337,5 +337,40 @@
   <object id="45" type="BreakableBrick" x="1984" y="416" width="16" height="16"/>
   <object id="46" type="BreakableBrick" x="1968" y="416" width="16" height="16"/>
   <object id="47" type="BreakableBrick" x="1952" y="416" width="16" height="16"/>
+  <object id="77" name="walker" type="Walker" x="224" y="400" width="16" height="16">
+   <properties>
+    <property name="TurnAtEdge" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="78" name="walker" type="Walker" x="496" y="400" width="16" height="16">
+   <properties>
+    <property name="TurnAtEdge" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="80" name="walker" type="Walker" x="832" y="384" width="16" height="16">
+   <properties>
+    <property name="TurnAtEdge" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="81" name="walker" type="Walker" x="912" y="384" width="16" height="16">
+   <properties>
+    <property name="TurnAtEdge" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="82" name="walker" type="Walker" x="992" y="384" width="16" height="16">
+   <properties>
+    <property name="TurnAtEdge" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="79" name="shellEnemy" type="ShellEnemy" x="560" y="368" width="16" height="16">
+   <properties>
+    <property name="TurnAtEdge" type="bool" value="true"/>
+   </properties>
+  </object>
+  <object id="83" name="shellEnemy" type="ShellEnemy" x="1376" y="304" width="16" height="16">
+   <properties>
+    <property name="TurnAtEdge" type="bool" value="false"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>

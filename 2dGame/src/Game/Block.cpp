@@ -1,4 +1,6 @@
 #include "Block.h"
+#include "Game/PlayScene.h"
+#include "Engine/Collision.h"
 
 void CBlock::Update(float dt, std::vector<CGameObject*>* coObjects)
 {
@@ -35,4 +37,24 @@ float CBlock::BumpOffset()
     else
         percent = bumpTimer / halfBumpTime;
     return percent * BLOCK_BUMP_HEIGHT;
+}
+
+void CBlock::HitObjectsAbove()
+{
+    if (CPlayScene::current == nullptr)
+        return;
+    float l, t, r, b;
+    GetBoundingBox(l, t, r, b);
+
+    for (CGameObject* obj : CPlayScene::current->GetObjects())
+    {
+        if (obj == this || obj->IsBlock() || obj->IsDeleted())
+            continue;
+
+        float el, et, er, eb;
+        obj->GetBoundingBox(el, et, er, eb);
+
+        if (CCollision::Overlap(l, t - 2, r, t, el, et, er, eb))
+            obj->OnHitFromBelow(this);
+    }
 }

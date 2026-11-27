@@ -36,6 +36,12 @@ namespace PlayerStats
     constexpr float BBOX_H = 14.0f;
     constexpr float FEET_OFFSET = 8.0f;           // chân nằm dưới tâm sprite 8 px (ô 16x16)
     constexpr float SENSOR_SKIN = 1.0f;
+
+    // ----- Đạp quái, bị thương -----
+    constexpr float STOMP_BOUNCE = 0.21f;           // vy khi đạp trúng quái
+    constexpr float HURT_INVULN_TIME = 1500.0f;     // ms bất tử sau khi bị thương
+    constexpr int   STOMP_POINTS[] = { 100, 200, 400, 800, 1000, 2000, 4000, 8000 };
+    constexpr int   STOMP_POINTS_COUNT = sizeof(STOMP_POINTS) / sizeof(STOMP_POINTS[0]);
 }
 
 #define PLAYER_START_X 40.0f

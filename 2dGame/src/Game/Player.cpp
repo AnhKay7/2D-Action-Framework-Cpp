@@ -33,8 +33,11 @@ void CPlayer::Update(float dt, std::vector<CGameObject*>* coObjects)
 {
 	if (coyoteTimer > 0)     coyoteTimer -= dt;
 	if (jumpBufferTimer > 0) jumpBufferTimer -= dt;
+	if (invulnTimer > 0)     invulnTimer -= dt;
 
 	CheckSensors(coObjects);
+	if (isOnGround)
+		stompChain = 0;
 	ReadInput();
 
 	UpdateHorizontal(dt);
@@ -48,9 +51,7 @@ void CPlayer::Update(float dt, std::vector<CGameObject*>* coObjects)
 
 	if (y > fallLimitY)
 	{
-		SetPosition(spawnX, spawnY);
-		vx = vy = 0;
-		meter = 0;
+		Respawn();
 	}
 
 	animator.Update(dt);
@@ -58,6 +59,8 @@ void CPlayer::Update(float dt, std::vector<CGameObject*>* coObjects)
 
 void CPlayer::Render()
 {
+	if (invulnTimer > 0 && ((int)(invulnTimer / 60)) % 2 == 0)
+		return;
 	animator.Render(x, y, nx < 0);
 }
 
@@ -262,5 +265,41 @@ void CPlayer::CheckTouches(std::vector<CGameObject*>* coObjects)
 			obj->OnPlayerTouch(this);
 		}
 	}
+}
 
+void CPlayer::OnStompEnemy() 
+{
+	vy = -STOMP_BOUNCE;
+	coyoteTimer = 0;
+	if (stompChain < STOMP_POINTS_COUNT)
+		score += STOMP_POINTS[stompChain++];
+	else
+		DebugOut(L"1 UP\n");
+	DebugOut(L"Score: %d\n", score);
+}
+
+void CPlayer::Respawn()
+{
+	SetPosition(spawnX, spawnY);
+	vx = vy = 0;
+	meter = 0;
+	stompChain = 0;
+	invulnTimer = HURT_INVULN_TIME;
+}
+
+void CPlayer::Hurt()
+{
+	if (invulnTimer > 0)
+		return;
+	if (isBig)
+	{
+		isBig = false;
+		invulnTimer = HURT_INVULN_TIME;
+		DebugOut(L"[PLAYER] Hurt: to -> nho\n");
+	}
+	else
+	{
+		DebugOut(L"[PLAYER] Chet (tam thoi: ve diem xuat phat)\n");
+		Respawn();
+	}
 }

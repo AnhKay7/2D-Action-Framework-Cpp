@@ -4,20 +4,19 @@
 
 #define BLOCK_SIZE 16
 
-constexpr float BLOCK_BUMP_TIME   = 120.0f;   // ms: nảy lên rồi về chỗ cũ
-constexpr float BLOCK_BUMP_HEIGHT = 5.0f;     // px: nảy cao nhất
+constexpr float BLOCK_BUMP_TIME   = 120.0f;
+constexpr float BLOCK_BUMP_HEIGHT = 5.0f;
 
-// Lớp cha cho các khối đội được từ dưới lên (khối "?", gạch).
-// Lo phần chung: chặn va chạm như gạch, hiệu ứng nảy, vẽ animation.
 class CBlock : public CGameObject
 {
 protected:
     CAnimator animator;
-    float bumpTimer = 0;            // > 0: đang nảy
+    float bumpTimer = 0;           
 
-    void  StartBump() { bumpTimer = BLOCK_BUMP_TIME; }
+    void  StartBump() { bumpTimer = BLOCK_BUMP_TIME; HitObjectsAbove(); }
+    void  HitObjectsAbove();        
     bool  IsBumping() { return bumpTimer > 0; }
-    float BumpOffset();             // độ cao đang nảy (px), bạn viết trong Block.cpp
+    float BumpOffset();             
 
 public:
     CBlock(float x, float y) : CGameObject(x, y) {}

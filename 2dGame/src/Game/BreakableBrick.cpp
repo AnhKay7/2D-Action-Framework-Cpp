@@ -23,6 +23,7 @@ void CBreakableBrick::OnHitFromBelow(CGameObject* by)
 
 void CBreakableBrick::Break()
 {
+    HitObjectsAbove();
     Delete();
     CPlayScene::current->Spawn(new CBrickPiece(x - 4, y - 4, -1, true), true);
     CPlayScene::current->Spawn(new CBrickPiece(x + 4, y - 4, 1, true), true);

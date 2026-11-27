@@ -33,5 +33,7 @@ public:
     void Unload() override;
 
     static CPlayScene* current;                          
-    void Spawn(CGameObject* obj, bool behind = false);   
+    void Spawn(CGameObject* obj, bool behind = false);
+    std::vector<CGameObject*>& GetObjects() { return objects; }
+    float GetMapHeightPx() { return (float)map.GetHeightPx(); }
 };
