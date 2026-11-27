@@ -13,6 +13,7 @@ private:
     std::vector<CGameObject*> objects;
     CPlayer* player = nullptr;
     bool showBBox = false;
+    std::vector<CGameObject*> pendingFront, pendingBack;
 
     void LoadAssets();                  
     void PurgeDeletedObjects();        
@@ -23,9 +24,16 @@ private:
 
     void BuildColliders(const TileLayer* layer, bool semiSolid);
     void SpawnObjects();
+
+    void FlushSpawned();
 public:
     void Load() override;
     void Update(float dt) override;
     void Render() override;
     void Unload() override;
+
+    static CPlayScene* current;                          
+    void Spawn(CGameObject* obj, bool behind = false);
+    std::vector<CGameObject*>& GetObjects() { return objects; }
+    float GetMapHeightPx() { return (float)map.GetHeightPx(); }
 };

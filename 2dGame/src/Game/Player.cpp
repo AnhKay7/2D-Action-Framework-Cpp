@@ -33,23 +33,25 @@ void CPlayer::Update(float dt, std::vector<CGameObject*>* coObjects)
 {
 	if (coyoteTimer > 0)     coyoteTimer -= dt;
 	if (jumpBufferTimer > 0) jumpBufferTimer -= dt;
+	if (invulnTimer > 0)     invulnTimer -= dt;
 
 	CheckSensors(coObjects);
+	if (isOnGround)
+		stompChain = 0;
 	ReadInput();
 
 	UpdateHorizontal(dt);
 	UpdateVertical(dt);
 
 	CCollision::Process(this, dt, coObjects);
+	CheckTouches(coObjects);
 
 	UpdateMeter(dt);
 	UpdateState();
 
 	if (y > fallLimitY)
 	{
-		SetPosition(spawnX, spawnY);
-		vx = vy = 0;
-		meter = 0;
+		Respawn();
 	}
 
 	animator.Update(dt);
@@ -57,6 +59,8 @@ void CPlayer::Update(float dt, std::vector<CGameObject*>* coObjects)
 
 void CPlayer::Render()
 {
+	if (invulnTimer > 0 && ((int)(invulnTimer / 60)) % 2 == 0)
+		return;
 	animator.Render(x, y, nx < 0);
 }
 
@@ -88,8 +92,10 @@ void CPlayer::GetBoundingBox(float& l, float& t, float& r, float& b)
 
 void CPlayer::OnCollisionWith(CCollisionEvent* e)
 {
-	if (e->ny != 0) vy = 0;     // chạm sàn hoặc cụng trần
-	if (e->nx != 0) vx = 0;     // đâm tường
+	if (e->ny != 0) vy = 0;  
+	if (e->ny > 0)
+		e->obj->OnHitFromBelow(this);
+	if (e->nx != 0) vx = 0;
 }
 
 void CPlayer::CheckSensors(std::vector<CGameObject*>* coObjects)
@@ -242,4 +248,58 @@ float CPlayer::JumpSpeedForCurrentRun()
 	if (fabs(vx) >= JUMP_MID_FROM)
 		return JUMP_SPEED_MID;
 	return JUMP_SPEED_SLOW;
+}
+
+void CPlayer::CheckTouches(std::vector<CGameObject*>* coObjects)
+{
+	for (CGameObject* obj : *coObjects)
+	{
+		if (obj == this || obj->IsDeleted() || obj->IsBlock())
+			continue;
+
+		float pl, pt, pr, pb, l, t, r, b;
+		GetBoundingBox(pl, pt, pr, pb);
+		obj->GetBoundingBox(l, t, r, b);
+		if (CCollision::Overlap(pl, pt, pr, pb, l, t, r, b))
+		{
+			obj->OnPlayerTouch(this);
+		}
+	}
+}
+
+void CPlayer::OnStompEnemy() 
+{
+	vy = -STOMP_BOUNCE;
+	coyoteTimer = 0;
+	if (stompChain < STOMP_POINTS_COUNT)
+		score += STOMP_POINTS[stompChain++];
+	else
+		DebugOut(L"1 UP\n");
+	DebugOut(L"Score: %d\n", score);
+}
+
+void CPlayer::Respawn()
+{
+	SetPosition(spawnX, spawnY);
+	vx = vy = 0;
+	meter = 0;
+	stompChain = 0;
+	invulnTimer = HURT_INVULN_TIME;
+}
+
+void CPlayer::Hurt()
+{
+	if (invulnTimer > 0)
+		return;
+	if (isBig)
+	{
+		isBig = false;
+		invulnTimer = HURT_INVULN_TIME;
+		DebugOut(L"[PLAYER] Hurt: to -> nho\n");
+	}
+	else
+	{
+		DebugOut(L"[PLAYER] Chet (tam thoi: ve diem xuat phat)\n");
+		Respawn();
+	}
 }

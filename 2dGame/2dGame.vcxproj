@@ -146,7 +146,13 @@
     <ClCompile Include="src\Engine\Camera.cpp" />
     <ClCompile Include="src\Engine\Collision.cpp" />
     <ClCompile Include="src\Engine\TileMap.cpp" />
+    <ClCompile Include="src\Game\Block.cpp" />
+    <ClCompile Include="src\Game\BreakableBrick.cpp" />
     <ClCompile Include="src\Game\Brick.cpp" />
+    <ClCompile Include="src\Game\Coin.cpp" />
+    <ClCompile Include="src\Game\CoinPop.cpp" />
+    <ClCompile Include="src\Game\Enemy.cpp" />
+    <ClCompile Include="src\Game\GrowItem.cpp" />
     <ClCompile Include="src\Game\Player.cpp" />
     <ClCompile Include="src\Engine\GameObject.cpp" />
     <ClCompile Include="src\Engine\Input.cpp" />
@@ -158,6 +164,9 @@
     <ClCompile Include="src\Engine\Game.cpp" />
     <ClCompile Include="src\Engine\Debug.cpp" />
     <ClCompile Include="src\Game\PlayScene.cpp" />
+    <ClCompile Include="src\Game\QuestionBlock.cpp" />
+    <ClCompile Include="src\Game\ShellEnemy.cpp" />
+    <ClCompile Include="src\Game\Walker.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\Engine\Texture.cpp" />
     <ClCompile Include="src\Engine\Textures.cpp" />
@@ -167,9 +176,16 @@
     <ClInclude Include="src\Engine\Collision.h" />
     <ClInclude Include="src\Engine\Scene.h" />
     <ClInclude Include="src\Engine\TileMap.h" />
+    <ClInclude Include="src\Game\Block.h" />
+    <ClInclude Include="src\Game\BreakableBrick.h" />
     <ClInclude Include="src\Game\Brick.h" />
     <ClInclude Include="src\Game\AssetIDs.h" />
+    <ClInclude Include="src\Game\BrickPiece.h" />
+    <ClInclude Include="src\Game\Coin.h" />
+    <ClInclude Include="src\Game\CoinPop.h" />
     <ClInclude Include="src\Game\Collider.h" />
+    <ClInclude Include="src\Game\Enemy.h" />
+    <ClInclude Include="src\Game\GrowItem.h" />
     <ClInclude Include="src\Game\Player.h" />
     <ClInclude Include="src\Engine\GameObject.h" />
     <ClInclude Include="src\Engine\Input.h" />
@@ -184,15 +200,32 @@
     <ClInclude Include="src\Engine\Textures.h" />
     <ClInclude Include="src\Game\PlayerStats.h" />
     <ClInclude Include="src\Game\PlayScene.h" />
+    <ClInclude Include="src\Game\QuestionBlock.h" />
+    <ClInclude Include="src\Game\ShellEnemy.h" />
+    <ClInclude Include="src\Game\Walker.h" />
     <ClInclude Include="src\ThirdParty\nlohmann\json.hpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="assets\tiles\map-1.1.tmj" />
+    <None Include="assets\tiles\map-1.1.tmx" />
+    <None Include="assets\tiles\map-1.1_fixed.tmx" />
+    <None Include="assets\tiles\Stage_Tiles.tsx" />
+    <None Include="assets\tiles\Stage_Tiles_full_backup.tsx" />
+    <None Include="assets\tiles\world-1-1.tsx" />
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
     <Image Include="assets\debug\bbox.png" />
+    <Image Include="assets\enemies\enemies.png" />
+    <Image Include="assets\enemies\shell.png" />
+    <Image Include="assets\enemies\shell_walker.png" />
+    <Image Include="assets\enemies\walker.png" />
     <Image Include="assets\tiles\brick.png" />
+    <Image Include="assets\tiles\Stage_Tiles_Plains1.png" />
+    <Image Include="assets\tiles\tileset_placeholder.png" />
+    <Image Include="assets\tiles\world-1-1.png" />
+    <Image Include="assets\tiles\world-1-1_16px.png" />
+    <Image Include="assets\tiles\[Example] NES - Super Mario Bros. 3 - Grass Land - Stage 1-1.png" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
